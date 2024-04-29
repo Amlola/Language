@@ -1,0 +1,38 @@
+call main 
+hlt 
+
+main:
+push 8.000000
+push 0
+pop rdx
+pop [rdx]
+push 0
+pop rdx
+push [rdx]
+push 9.000000
+ja label0
+push 0
+pop rdx
+push [rdx]
+push 1.000000
+add
+push 1
+pop rdx
+pop [rdx]
+push 15.000000
+push 2
+pop rdx
+pop [rdx]
+jmp label1 
+label0: 
+jmp label1 
+label1: 
+jmp label2
+label2:
+push 1
+pop rdx
+push [rdx]
+out
+push 0.000000
+pop rcx
+ret

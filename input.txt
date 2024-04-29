@@ -1,0 +1,11 @@
+int main()
+type
+    if (a > 4)
+    type
+        a = 5;
+    sent
+
+    print(a);
+    
+    return 0;
+sent

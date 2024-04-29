@@ -1,0 +1,78 @@
+digraph struct {bgcolor=RosyBrown rankdir = HR
+
+
+label = "tree_dump from function int main(), Tree/main.cpp:27";
+node0[shape=record, style=filled, fillcolor="red", label=" {ADDRESS: 007D0FA0 | DATA: main | PARENT: 00000000 | LEFT: 007D1028 | RIGHT: 007D10B0 | TYPE: 4}"];
+node0->node1 [color = "lime"];
+node1[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1028 | DATA: 23 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 3}"];
+node0->node2 [color = "aqua"];
+node2[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D10B0 | PARENT: 00000000 | LEFT: 007D1138 | RIGHT: 007D11C0 | TYPE: 5}"];
+node2->node3 [color = "lime"];
+node3[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1138 | DATA: 15 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 3}"];
+node2->node4 [color = "aqua"];
+node4[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D11C0 | DATA: 18 | PARENT: 00000000 | LEFT: 007D1248 | RIGHT: 007D14F0 | TYPE: 3}"];
+node4->node5 [color = "lime"];
+node5[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1248 | DATA: x | PARENT: 00000000 | LEFT: 007D12D0 | RIGHT: 007D1358 | TYPE: 6}"];
+node5->node6 [color = "lime"];
+node6[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D12D0 | DATA: 23 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 3}"];
+node5->node7 [color = "aqua"];
+node7[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D1358 | DATA: 9 | PARENT: 00000000 | LEFT: 007D13E0 | RIGHT: 007D1468 | TYPE: 3}"];
+node7->node8 [color = "lime"];
+node8[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D13E0 | DATA: x | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node7->node9 [color = "aqua"];
+node9[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D1468 | DATA: 8.000000 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 1}"];
+node4->node10 [color = "aqua"];
+node10[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D14F0 | DATA: 18 | PARENT: 00000000 | LEFT: 007D1578 | RIGHT: 007D7740 | TYPE: 3}"];
+node10->node11 [color = "lime"];
+node11[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1578 | DATA: 24 | PARENT: 00000000 | LEFT: 007D1600 | RIGHT: 007D1798 | TYPE: 3}"];
+node11->node12 [color = "lime"];
+node12[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1600 | DATA: 4 | PARENT: 00000000 | LEFT: 007D1688 | RIGHT: 007D1710 | TYPE: 3}"];
+node12->node13 [color = "lime"];
+node13[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D1688 | DATA: x | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node12->node14 [color = "aqua"];
+node14[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D1710 | DATA: 9.000000 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 1}"];
+node11->node15 [color = "aqua"];
+node15[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D1798 | DATA: 26 | PARENT: 00000000 | LEFT: 007D7300 | RIGHT: 007D79E8 | TYPE: 3}"];
+node15->node16 [color = "lime"];
+node16[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7300 | DATA: 18 | PARENT: 00000000 | LEFT: 007D6F48 | RIGHT: 00000000 | TYPE: 3}"];
+node16->node17 [color = "lime"];
+node17[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D6F48 | DATA: y | PARENT: 00000000 | LEFT: 007D7960 | RIGHT: 007D7520 | TYPE: 6}"];
+node17->node18 [color = "lime"];
+node18[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7960 | DATA: 23 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 3}"];
+node17->node19 [color = "aqua"];
+node19[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D7520 | DATA: 9 | PARENT: 00000000 | LEFT: 007D70E0 | RIGHT: 007D75A8 | TYPE: 3}"];
+node19->node20 [color = "lime"];
+node20[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D70E0 | DATA: y | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node19->node21 [color = "aqua"];
+node21[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D75A8 | DATA: 10 | PARENT: 00000000 | LEFT: 007D7630 | RIGHT: 007D7DA0 | TYPE: 3}"];
+node21->node22 [color = "lime"];
+node22[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7630 | DATA: x | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node21->node23 [color = "aqua"];
+node23[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D7DA0 | DATA: 1.000000 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 1}"];
+node15->node24 [color = "aqua"];
+node24[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D79E8 | DATA: 18 | PARENT: 00000000 | LEFT: 007D7168 | RIGHT: 00000000 | TYPE: 3}"];
+node24->node25 [color = "lime"];
+node25[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7168 | DATA: t | PARENT: 00000000 | LEFT: 007D7E28 | RIGHT: 007D6FD0 | TYPE: 6}"];
+node25->node26 [color = "lime"];
+node26[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7E28 | DATA: 23 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 3}"];
+node25->node27 [color = "aqua"];
+node27[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D6FD0 | DATA: 9 | PARENT: 00000000 | LEFT: 007D7388 | RIGHT: 007D76B8 | TYPE: 3}"];
+node27->node28 [color = "lime"];
+node28[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7388 | DATA: t | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node27->node29 [color = "aqua"];
+node29[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D76B8 | DATA: 15.000000 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 1}"];
+node10->node30 [color = "aqua"];
+node30[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D7740 | DATA: 18 | PARENT: 00000000 | LEFT: 007D7058 | RIGHT: 007D7850 | TYPE: 3}"];
+node30->node31 [color = "lime"];
+node31[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D7058 | DATA: 30 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 007D77C8 | TYPE: 3}"];
+node31->node32 [color = "aqua"];
+node32[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D77C8 | DATA: y | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 2}"];
+node30->node33 [color = "aqua"];
+node33[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D7850 | DATA: 18 | PARENT: 00000000 | LEFT: 007D78D8 | RIGHT: 00000000 | TYPE: 3}"];
+node33->node34 [color = "lime"];
+node34[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 007D78D8 | DATA: 29 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 007D7A70 | TYPE: 3}"];
+node34->node35 [color = "aqua"];
+node35[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 007D7A70 | DATA: 0.000000 | PARENT: 00000000 | LEFT: 00000000 | RIGHT: 00000000 | TYPE: 1}"];
+
+
+}

@@ -1,0 +1,16 @@
+all: MYBACK
+
+MYBACK: main.o tree_backend.o ToAsm.o
+	g++ -g -DDUMP -o back main.o tree_backend.o ToAsm.o
+
+main.o: main.cpp
+	g++ -g -DDUMP -c main.cpp
+
+tree_backend.o: tree_backend.cpp
+	g++ -g -DDUMP -c tree_backend.cpp
+
+ToAsm.o: ToAsm.cpp
+	g++ -g -DDUMP -c ToAsm.cpp
+
+clean:
+	rm *.o MYBACK.exe
