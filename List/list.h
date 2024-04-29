@@ -1,13 +1,12 @@
 #pragma once
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
-
-
 
 
 #define INDEX_LIST
@@ -17,32 +16,19 @@
 #endif
 
 
+const int MAX_COMMAND_LENGTH = 125;
 
-const size_t WORD_MAX_LEN = 250;
+#define POISON_VALUE_FOR_ADRESS (List_type*)0xDED
 
-
-
-
-struct Token
-    {
-    int type;
-
-    union NodeType
-        {
-        int key_w;
-        double num;
-        char id[WORD_MAX_LEN];
-        }form;
-    };
+#define POISON_NUMBER_FOR_VALUE 238832
 
 
-
-struct Text
-    {
-    char* Buf;
-    long long BufSize;
-    size_t count_n;
-    };
+const int size_list       =  0;
+const int capacity_list   = 10;
+const int size_extend     =  2;
+const int ZERO            =  0;
+const int FREE_INDEX      = -1;
+const size_t WORD_MAX_LEN = 50;
 
 
 enum Types
@@ -57,6 +43,19 @@ enum Types
     };
 
 
+struct Token
+    {
+    Types type;
+
+    union NodeType
+        {
+        int key_w;
+        double num;
+        char id[WORD_MAX_LEN];
+        }form;
+    };
+
+
 const char* const str_types[] =
     {
     "constant", "id_type", "keyw_type", 
@@ -66,25 +65,6 @@ const char* const str_types[] =
 
 
 typedef Token List_type;
-
-
-
-const int size_list     =   0;
-const int capacity_list =   10;
-const int size_extend   =   2;
-
-const int ZERO          =   0;
-const int FREE_INDEX    =  -1;
-
-
-
-const int MAX_COMMAND_LENGTH = 125;
-
-
-
-#define POISON_VALUE_FOR_ADRESS (List_type*)0xDED
-
-#define POISON_NUMBER_FOR_VALUE 238832
 
 
 struct Node
@@ -109,7 +89,6 @@ struct LIST
     };
 
 
-
 typedef enum
     {
     LIST_OK                    = 0,
@@ -124,7 +103,6 @@ typedef enum
     INDEX_BIGGER_THAN_CAPACITY = 1 << 9,
     NUMBER_OF_ERROR            = 10
     }ListError;
-
 
 
 typedef struct 
@@ -146,7 +124,6 @@ const LIST_STATUS ErrorArray[] =
     {CAPACITY_LESS_THAN_SIZE,    "CAPACITY LESS THAN SIZE"},
     {INDEX_BIGGER_THAN_CAPACITY, "INDEX BIGGER THAN CAPACITY"},
     };
-
 
 
 int ListCtor(LIST* list);
@@ -182,4 +159,3 @@ iterator_t Begin(LIST* list);
 iterator_t End(LIST* list);
 
 void UpdateParams(LIST* list); 
-

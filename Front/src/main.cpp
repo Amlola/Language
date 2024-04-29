@@ -2,13 +2,21 @@
 
 
 
-int main() 
+int main(int argc, char* argv[]) 
     {    
     Text analyz = {};
 
     LIST tokens = {};
 
-    FILE* file_input = fopen("../input.txt", "r");
+    if (argc < 2) 
+        {
+        fprintf(stderr, "you must specify the input and output file\n");
+        return NOT_ALL_ARGUMENTS_ARE_SPECIFIED;
+        }
+
+    FILE* file_input = fopen(argv[1], "r");
+
+    CHECK_FILE(file_input, argv[1]);
 
     FileInput(file_input, &analyz);
 
@@ -34,13 +42,17 @@ int main()
 
     TreeDump(&tree, tree.root);
 
-    FILE* file_output = fopen("../output.txt", "w");
+    FILE* file_output = fopen(argv[2], "w");
+
+    CHECK_FILE(file_output, argv[2]);
 
     TreePrefixPrint(&tree, tree.root, file_output, &table_array);
 
     fclose(file_output);
 
     FILE* name_table_file = fopen("../name_table.txt", "w");
+
+    CHECK_FILE(name_table_file, "../name_table.txt");
 
     WriteNameTableArrayToFile(name_table_file, &table_array);
 

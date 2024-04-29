@@ -252,10 +252,9 @@ Node_t* GetFunc(LIST* tokens, List_type func, LangNameTableArray* table_array)  
 		return CreateNode(func, CALL_TYPE, arg_branch, name_func);
 
 	else
-	    {
 		fprintf(stderr, "Error: bad arguments in function\n");
-		exit(EXIT_FAILURE);
-        }
+    
+    return nullptr;
     }
 
 
@@ -459,10 +458,9 @@ Node_t* GetAssign(LIST* tokens, LangNameTableArray* table_array)
 	    }
 
 	else
-	    {
 		fprintf(stderr, "Unknown operator\n");
-		exit(EXIT_FAILURE);
-	    }
+
+    return nullptr;
     }
 
 

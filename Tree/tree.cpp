@@ -1,7 +1,6 @@
 #include "tree.h"
 
 
-
 void TreeCtor(Tree* tree)
     {   
     tree->status = TREE_OK;
@@ -12,7 +11,6 @@ void TreeCtor(Tree* tree)
 
     tree->size = 0;
     }
-
 
 
 Node_t* CreateNode(Token token, Types type, Node_t* left, Node_t* right)
@@ -137,7 +135,6 @@ Type_error TreeDtor(Tree* tree)
     }
 
 
-
 Type_error CheckTreeLinks(Tree* tree, Node_t* node)
     {    
     if (node->left != nullptr && node->right != nullptr && (node->left->parent != node || node->right->parent != node))
@@ -154,7 +151,6 @@ Type_error CheckTreeLinks(Tree* tree, Node_t* node)
 
     return TREE_OK;
     }
-
 
 
 bool TreeVerify(Tree* tree) 
@@ -182,6 +178,8 @@ bool TreeVerify(Tree* tree)
     return tree->status;
     }
 
+
+/*---------------------------------------------------TREE_DUMP--------------------------------------------------------*/
 
 
 void NodeDump(Node_t* node, size_t* number_of_node, Child child, const char* color) 
@@ -257,8 +255,6 @@ void PrintGraphNode(Node_t* node, size_t* number_of_node, Child child, const cha
     }
 
 
-
-
 void TreeDumpFunction(Tree* tree, Node_t* node, const char* path, const char* signature, unsigned line) 
     {
     logfile = fopen("logfile.html", "a");
@@ -317,3 +313,140 @@ void TreeDumpFunction(Tree* tree, Node_t* node, const char* path, const char* si
         dump_number++;
         } 
     }
+
+
+/*--------------------------------------------------Backend/Reverse_Read----------------------------------------------------*/
+
+
+#define CREATE_NUM_NODE CreateNode(tok, NUM_TYPE, nullptr, nullptr)
+#define CREATE_KEYW_NODE CreateNode(tok, KEYW_TYPE, nullptr, nullptr)
+
+
+Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array) 
+    {
+    size_t i = 0;
+
+    tree->root = PrefixReadTree(tree, data, &i, table_array);
+    
+    return tree->status;
+    }
+
+
+Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)      // need to be fix
+    {
+    Node_t* node = nullptr;
+    
+    if (data->Buf[*i] == '(') 
+        {
+        List_type tok = {};
+
+        (*i) += SPACE_MAGNIFICATION;
+
+        tok.type = (Types)(GET_NUMBER(*i));      
+
+        if (tok.type == NUM_TYPE) 
+            {
+            (*i) += SPACE_MAGNIFICATION;
+
+            double value = 0;
+
+            int skip_symbols  = 0;
+
+            sscanf(data->Buf + *i, "%lf%n", &value, &skip_symbols);
+
+            tok.form.num = value;
+
+            node = CREATE_NUM_NODE;
+
+            (*i) += skip_symbols + 1;
+            }
+
+        else if (tok.type == KEYW_TYPE) 
+            {
+            (*i) += SPACE_MAGNIFICATION;
+
+            int value = 0;
+
+            int skip_symbols = 0;
+
+            sscanf(data->Buf + *i, "%d%n", &value, &skip_symbols);
+
+            tok.form.key_w = value;
+
+            node = CREATE_KEYW_NODE;
+
+            (*i) += skip_symbols + 1;
+            }
+
+        else if (tok.type == ID_TYPE || tok.type == VAR_DECL_TYPE || tok.type == FUNC_DEF_TYPE) 
+            {
+            (*i) += SPACE_MAGNIFICATION;
+
+            int value = 0;
+
+            int skip_symbols = 0;
+
+            sscanf(data->Buf + *i, "%d%n", &value, &skip_symbols);
+
+            printf("VAL: %d\n", value);    
+        
+            strcpy(tok.form.id, FindInNameTableByCode(&table_array->Array[GENERAL_TABLE_INDEX], value));
+
+            (*i) += skip_symbols + 1;
+
+            node = CreateNode(tok, tok.type, nullptr, nullptr);
+            }
+
+        else 
+            { 
+            node = CreateNode(tok, tok.type, nullptr, nullptr);
+
+            (*i) += SPACE_MAGNIFICATION;
+            }
+        } 
+
+        node->left  = CreateNodeFromBrackets(tree, data, i, table_array);
+
+        node->right = CreateNodeFromBrackets(tree, data, i, table_array);
+
+        if (data->Buf[*i] != ')')
+            {
+            TreeDtor(tree);
+
+            return nullptr;
+            }
+
+    return node;
+    }
+
+
+Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)
+    {
+    Node_t* node = nullptr;
+
+    if (data->Buf[*i] == '(')
+        {
+        node = PrefixReadTree(tree, data, i, table_array);
+
+        (*i) += SPACE_MAGNIFICATION;
+
+        if (node == nullptr)
+            return nullptr;
+        }
+
+    else if (data->Buf[*i] != ')')
+        {
+        if (data->Buf[*i] == '_')
+            {
+            (*i) += SPACE_MAGNIFICATION;
+
+            return nullptr;
+            }
+        }
+
+    return node;
+    }
+
+
+#undef CREATE_NUM_NODE
+#undef CREATE_KEYW_NODE

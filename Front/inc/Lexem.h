@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "../../ReadingFile/read.h"
 #include "../../NameTable/name_table.h"
 
 
@@ -30,7 +31,6 @@ enum OperatorCode
     };
 
 
-
 int IsKeyword (char* word, int *keyword_code);
 
 int GetWord(Text* data, char word[WORD_MAX_LEN], size_t* i);
@@ -38,13 +38,3 @@ int GetWord(Text* data, char word[WORD_MAX_LEN], size_t* i);
 void GetTokensFromOneString(LIST* tokens, Text* data, size_t* i, LangNameTable* general_table); 
 
 int GetTokens(Text* data, LIST* tokens, LangNameTable* general_table); 
-
-void ReplaceSlash_n(char* Buf, size_t BufSize);
-
-int NumberLines(char* Buf, size_t BufSize);
-
-long long GetFileSize(FILE* file);
-
-void FileInput(FILE* file, Text* data);
-
-int SkipSpaces(Text* data, size_t i);

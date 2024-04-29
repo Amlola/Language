@@ -1,11 +1,21 @@
 int main()
 type
-    if (a > 4)
-    type
-        a = 5;
-    sent
+    int a = input();
+    int b = input();
 
-    print(a);
+    int res = Factorial(a, b);
+
+    print(res);
     
     return 0;
+sent
+
+int Factorial(int a, int b)
+type
+    if (a > b)
+    type
+        return a;
+    sent
+
+    return b;
 sent

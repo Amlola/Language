@@ -2,7 +2,7 @@
 
 
 #include "../List/list.h"
-
+#include "../ReadingFile/read.h"
 
 
 const size_t MAX_NAME_LEN                = 50;
@@ -16,6 +16,7 @@ const size_t GLOBAL_TABLE_INDEX          = 1;
 
 enum UnitNameTableTypes 
     {
+    GENERAL_TYPE   = 0,
     VAR_NAME       = 1,
     FUNC_NAME      = 2,
     DATA_TYPE_NAME = 4
@@ -57,7 +58,6 @@ struct LangNameTableArray
     };
 
 
-
 NameTableError NameTableCtor(LangNameTable* name_table);
 
 NameTableError NameTableDtor(LangNameTable* name_table);
@@ -83,3 +83,9 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
 NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table);
 
 void AddToNameTableIfNotFind(LangNameTable* name_table, char* name, size_t number, UnitNameTableTypes type); 
+
+NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data);
+
+NameTableError GetString(Text* data, char** string, size_t* i);
+
+int SkipSpacesAndEndOfString(Text* data, size_t i);

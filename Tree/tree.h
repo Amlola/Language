@@ -161,3 +161,9 @@ void PrintGraphNode(Node_t* node, size_t* number_of_node, Child child, const cha
 Node_t* CreateNode(Token token, Types type, Node_t* left, Node_t* right);
 
 Type_error CheckTreeLinks(Tree* tree, Node_t* node);
+
+Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array);
+
+Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
+
+Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);

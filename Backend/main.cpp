@@ -12,8 +12,6 @@ int main()
 
     FILE* file_input = fopen("../Front/output.txt", "r");
 
-    printf("GOOD\n");
-
     FileInput(file_input, &data);
 
     printf("ZERO_ELEM: %c\n", data.Buf[0]);
