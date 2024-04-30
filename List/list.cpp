@@ -1,7 +1,6 @@
 #include "list.h"
 
 
-
 int ListCtor(LIST *list)
     {
     assert(list);
@@ -18,7 +17,6 @@ int ListCtor(LIST *list)
 
     list->back     = ZERO;
 
-
     list->data = (Node*)calloc(list->capacity, sizeof(Node));
 
     if (list->data == nullptr)
@@ -34,7 +32,6 @@ int ListCtor(LIST *list)
 
     return list->status;
     }
-
 
 
 int ListVerify(LIST* list)
@@ -69,7 +66,6 @@ int ListVerify(LIST* list)
     }
 
 
-
 void ListDtor(LIST* list)
     {
     assert(list);
@@ -88,12 +84,10 @@ void ListDtor(LIST* list)
     }
 
 
-
 int PushFront(LIST* list, List_type value)
     {
     return ListInsert(list, value, list->front);
     }
-
 
 
 int PushBack(LIST* list, List_type value)
@@ -102,14 +96,12 @@ int PushBack(LIST* list, List_type value)
     }
 
 
-
 void UpdateParams(LIST* list) 
     {
     list->front = list->data[ZERO].next;
 
     list->back = list->data[ZERO].prev;
     }
-
 
 
 int ListInsert(LIST* list, List_type value, iterator_t index)
@@ -163,19 +155,16 @@ int ListInsert(LIST* list, List_type value, iterator_t index)
     }
 
 
-
 int PopFront(LIST* list)
     {
     return ListDelete(list, list->front);
     }
 
 
-
 int PopBack(LIST* list)
     {
     return ListDelete(list, list->back);
     }
-
 
 
 int ListDelete(LIST* list, iterator_t index)
@@ -210,7 +199,6 @@ int ListDelete(LIST* list, iterator_t index)
 
     return list->status;
     }
-
 
 
 static int ListResize(LIST* list, int new_capacity_list)
@@ -285,7 +273,6 @@ iterator_t FindByIndex(LIST* list, size_t index)
 
     return cur_ind;
     }
-
 
 
 static void SetList(LIST* list, size_t size)

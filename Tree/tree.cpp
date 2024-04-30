@@ -216,8 +216,6 @@ void PrintGraphNode(Node_t* node, size_t* number_of_node, Child child, const cha
 
     if (node->kind.type == KEYW_TYPE)
         {
-        printf("%d\n", node->kind.form.key_w);
-
         size_t pos = 0;
         for (size_t j = 0; j < NUMBER_OF_KEYWORD; j++)
             {
@@ -234,21 +232,18 @@ void PrintGraphNode(Node_t* node, size_t* number_of_node, Child child, const cha
 
     else if (node->kind.type == NUM_TYPE) 
         {
-        printf("NUM\n");
         print("node%zu[shape=record, style=filled, fillcolor=\"%s\", label=\" {ADDRESS: %p | DATA: %lf | PARENT: %p | LEFT: %p | RIGHT: %p | TYPE: %s}\"];\n", 
                                               *number_of_node, color, node, node->kind.form.num, node->parent, node->left, node->right, str_types[node->kind.type - 1]);  
         }
 
     else if (node->kind.type == ID_TYPE || node->kind.type == VAR_DECL_TYPE || node->kind.type == FUNC_DEF_TYPE) 
         {
-        printf("%s\n", node->kind.form.id);
         print("node%zu[shape=record, style=filled, fillcolor=\"%s\", label=\" {ADDRESS: %p | DATA: %s | PARENT: %p | LEFT: %p | RIGHT: %p | TYPE: %s}\"];\n", 
                                               *number_of_node, color, node, node->kind.form.id, node->parent, node->left, node->right, str_types[node->kind.type - 1]);  
         }
     
     else 
         {
-        printf("OTHER\n");
         print("node%zu[shape=record, style=filled, fillcolor=\"%s\", label=\" {ADDRESS: %p | PARENT: %p | LEFT: %p | RIGHT: %p | TYPE: %s}\"];\n", 
                                               *number_of_node, color, node, node->parent, node->left, node->right, str_types[node->kind.type - 1]);
         }
@@ -318,8 +313,7 @@ void TreeDumpFunction(Tree* tree, Node_t* node, const char* path, const char* si
 /*--------------------------------------------------Backend/Reverse_Read----------------------------------------------------*/
 
 
-#define CREATE_NUM_NODE CreateNode(tok, NUM_TYPE, nullptr, nullptr)
-#define CREATE_KEYW_NODE CreateNode(tok, KEYW_TYPE, nullptr, nullptr)
+#define CREATE_NODE CreateNode(tok, tok.type, nullptr, nullptr);
 
 
 Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array) 
@@ -332,7 +326,7 @@ Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array)
     }
 
 
-Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)      // need to be fix
+Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)
     {
     Node_t* node = nullptr;
     
@@ -342,9 +336,16 @@ Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* ta
 
         (*i) += SPACE_MAGNIFICATION;
 
-        tok.type = (Types)(GET_NUMBER(*i));      
+        tok.type = (Types)(GET_NUMBER(*i)); 
 
-        if (tok.type == NUM_TYPE) 
+        if (tok.type == CALL_TYPE || tok.type == PARAM_TYPE)
+            { 
+            node = CREATE_NODE;
+
+            (*i) += SPACE_MAGNIFICATION;
+            }
+
+        else
             {
             (*i) += SPACE_MAGNIFICATION;
 
@@ -354,54 +355,28 @@ Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* ta
 
             sscanf(data->Buf + *i, "%lf%n", &value, &skip_symbols);
 
-            tok.form.num = value;
-
-            node = CREATE_NUM_NODE;
-
             (*i) += skip_symbols + 1;
-            }
+            
+            if (tok.type == NUM_TYPE) 
+                {
+                tok.form.num = value;
 
-        else if (tok.type == KEYW_TYPE) 
-            {
-            (*i) += SPACE_MAGNIFICATION;
+                node = CREATE_NODE;
+                }
 
-            int value = 0;
+            else if (tok.type == KEYW_TYPE) 
+                {
+                tok.form.key_w = value;
 
-            int skip_symbols = 0;
+                node = CREATE_NODE;
+                }
 
-            sscanf(data->Buf + *i, "%d%n", &value, &skip_symbols);
+            else if (tok.type == ID_TYPE || tok.type == VAR_DECL_TYPE || tok.type == FUNC_DEF_TYPE) 
+                {
+                strcpy(tok.form.id, FindInNameTableByCode(&table_array->Array[GENERAL_TABLE_INDEX], value));
 
-            tok.form.key_w = value;
-
-            node = CREATE_KEYW_NODE;
-
-            (*i) += skip_symbols + 1;
-            }
-
-        else if (tok.type == ID_TYPE || tok.type == VAR_DECL_TYPE || tok.type == FUNC_DEF_TYPE) 
-            {
-            (*i) += SPACE_MAGNIFICATION;
-
-            int value = 0;
-
-            int skip_symbols = 0;
-
-            sscanf(data->Buf + *i, "%d%n", &value, &skip_symbols);
-
-            printf("VAL: %d\n", value);    
-        
-            strcpy(tok.form.id, FindInNameTableByCode(&table_array->Array[GENERAL_TABLE_INDEX], value));
-
-            (*i) += skip_symbols + 1;
-
-            node = CreateNode(tok, tok.type, nullptr, nullptr);
-            }
-
-        else 
-            { 
-            node = CreateNode(tok, tok.type, nullptr, nullptr);
-
-            (*i) += SPACE_MAGNIFICATION;
+                node = CREATE_NODE;
+                }
             }
         } 
 
@@ -448,5 +423,4 @@ Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableA
     }
 
 
-#undef CREATE_NUM_NODE
-#undef CREATE_KEYW_NODE
+#undef CREATE_NODE

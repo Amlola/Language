@@ -1,21 +1,4 @@
-int main()
+int main(int a, int b)
 type
-    int a = input();
-    int b = input();
-
-    int res = Factorial(a, b);
-
-    print(res);
-    
-    return 0;
-sent
-
-int Factorial(int a, int b)
-type
-    if (a > b)
-    type
-        return a;
-    sent
-
-    return b;
+    print(a);
 sent

@@ -3,13 +3,13 @@
 
 int main(int argc, char* argv[]) 
     {
-    Text analyz = {};
-
      if (argc < 2) 
         {
         fprintf(stderr, "you must specify the input, name_table and output file\n");
         return NOT_ALL_ARGUMENTS_ARE_SPECIFIED;
         }
+
+    Text analyz = {};
 
     FILE* file_input = fopen(argv[1], "r");
 
@@ -37,11 +37,23 @@ int main(int argc, char* argv[])
 
     TreeRead(&tree, &analyz, &table_array);
 
+    FILE* lang_file = fopen("../lang_file.txt", "w");
+
+    CHECK_FILE(lang_file, "../lang_file.txt");
+
+    GetMySyntax(tree.root, lang_file);
+
+    fclose(lang_file);
+
     TreeDump(&tree, tree.root);
 
     free(analyz.Buf);
 
+    free(data_name_table.Buf);
+
     NameTableArrayDtor(&table_array);
+
+    TreeDtor(&tree);
 
     printf("ALL IS GOOD\n");
 

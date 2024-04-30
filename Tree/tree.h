@@ -31,7 +31,6 @@ typedef char* Tree_type;
 
 typedef int Type_error;
 
-
 enum Tree_status
     {
     TREE_OK                       = 0,
@@ -50,7 +49,7 @@ struct Node_t
     Node_t* left;
     Node_t* right;
     Node_t* parent;
-    Token kind;
+    List_type kind;
     };
 
 

@@ -237,7 +237,7 @@ NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table)
     }
 
 
-NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data)           // need to be better
+NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data)
     {
     assert(table_array);
     assert(data);

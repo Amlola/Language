@@ -29,7 +29,7 @@ enum OperatorCode
     #undef DEF_OPER
     #undef DEF_OTHER
     };
-
+    
 
 int IsKeyword (char* word, int *keyword_code);
 

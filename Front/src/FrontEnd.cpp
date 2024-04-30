@@ -21,16 +21,16 @@ Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array)
     {
     Node_t* func = GetDefFunc(tokens, table_array);
 
-    if (GET_TOKEN_VALUE.form.key_w == KEYW_ENDOF) 
-        return func;
+    List_type fict_token = GetFictToken();
+
+    if (GET_TOKEN_VALUE.form.key_w == KEYW_ENDOF)
+        return CreateNode(fict_token, KEYW_TYPE, func, nullptr);
     
     else 
         {
-		List_type fict_token = GetFictToken();
+        //Node_t* fict_node = CreateNode(fict_token, KEYW_TYPE, GetGrammar(tokens, table_array), nullptr);
 
-        Node_t* fict_node = CreateNode(fict_token, KEYW_TYPE, GetGrammar(tokens, table_array), nullptr);
-
-        func = CreateNode(fict_token, KEYW_TYPE, func, fict_node);
+        func = CreateNode(fict_token, KEYW_TYPE, func, GetGrammar(tokens, table_array));
         }
 
 	return func;
@@ -512,7 +512,7 @@ Node_t* GetIf(LIST* tokens, LangNameTableArray* table_array)
 
 	List_type if_type = {};
 
-	if_type.type = KEYW_TYPE;                                       // maybe fix
+	if_type.type = KEYW_TYPE;                                 
 
 	if_type.form.key_w = KEYW_IF;
 
