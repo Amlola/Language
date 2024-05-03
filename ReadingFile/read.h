@@ -10,9 +10,8 @@
 
 
 const int ASCII_ZERO = 48;
-const int SPACE_MAGNIFICATION = 2;
-const size_t WORD_BEGIN_INDEX = 2;
-
+const size_t WORD_INDEX_BEGIN = 2;
+const size_t SPACE_MAGNIFICATION = 2;
 
 #define GET_NUMBER(index) data->Buf[index] - ASCII_ZERO
 
@@ -49,3 +48,5 @@ long long GetFileSize(FILE* file);
 void FileInput(FILE* file, Text* data);
 
 int SkipSpaces(Text* data, size_t i);
+
+size_t SkipEndOfString(Text* data, size_t i); 

@@ -6,12 +6,18 @@
 
 const int GLOBAL_TABLE_ID = -1;
 
+const int SYNTAX_ERROR = -1;
+
+#define NO_ERROR_PTR (Node_t*)(123456);
+
 
 Node_t* GetGlobalNameTable(LIST* tokens, LangNameTableArray* table_array); 
 
 Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array);
 
 Node_t* GetDefFunc(LIST* tokens, LangNameTableArray* table_array);
+
+Node_t* GetGlobalVariable(LIST* tokens, LangNameTableArray* table_array, List_type var_name, List_type var_type);
 
 Node_t* GetOperatorsSequence(LIST* tokens, LangNameTableArray* table_array);
 
@@ -61,18 +67,33 @@ Node_t* GetNumber(LIST* tokens, LangNameTableArray* table_array);
 
 Node_t* GetArgumentSequence(LIST* tokens, LangNameTableArray* table_array);
 
-void CheckValidFunc(LIST* tokens);
+Node_t* GetCyclesOperators(LIST* tokens, List_type token);
 
-void CheckOpenRoundBracket(LIST* tokens);
+Node_t* CheckInitialization(List_type token);
 
-void CheckIdName(LIST* tokens);
+Node_t* CheckOpenRoundBracket(LIST* tokens);
 
-void CheckCloseRoundBracket(LIST* tokens);
+Node_t* CheckIdName(List_type token);
 
-void CheckOpenFigBracket(LIST* tokens);
+Node_t* CheckCloseRoundBracket(LIST* tokens);
 
-void CheckCloseFigBracket(LIST* tokens);
+Node_t* CheckOpenFigBracket(LIST* tokens);
+
+Node_t* CheckCloseFigBracket(LIST* tokens);
+
+Node_t* CheckSequentialOperator(List_type oper);
 
 List_type GetFictToken();
 
 void CheckTableArraySize(LangNameTableArray* table_array);
+
+bool CheckOperators(List_type oper);
+
+void FrontDtor(Tree* tree, LIST* list, LangNameTableArray* table_array);
+
+void BeginningOfInitVar(LangNameTable* table);
+
+Node_t* GetInitVarInNameTable(LangNameTableArray* table_array, List_type token);
+
+Node_t* CheckAssign(LIST* tokens, LangNameTableArray* table_array, 
+                    List_type var_name, List_type var_type, Node_t* rValue, Node_t* type);

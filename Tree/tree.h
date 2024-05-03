@@ -166,3 +166,7 @@ Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array);
 Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
 
 Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
+
+const char* GetKeyword(Node_t* node);
+
+const char* GetKeywordByNumber(int number_keyword);

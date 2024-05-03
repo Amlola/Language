@@ -424,3 +424,30 @@ Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableA
 
 
 #undef CREATE_NODE
+
+
+const char* GetKeyword(Node_t* node) 
+    {
+    assert(node);
+
+    printf("%d\n", node->kind.form.key_w);
+
+    for (size_t i = 0; i < NUMBER_OF_KEYWORD; i++) 
+        {
+        if (node->kind.form.key_w == keyword_array[i].num)
+            return keyword_array[i].name;
+        }
+    
+    return nullptr;
+    }
+
+const char* GetKeywordByNumber(int number_keyword) 
+    {
+    for (size_t i = 0; i < NUMBER_OF_KEYWORD; i++) 
+        {
+        if (number_keyword == keyword_array[i].num)
+            return keyword_array[i].name;
+        }
+
+    return nullptr;
+    }

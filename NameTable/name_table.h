@@ -38,6 +38,7 @@ struct LangNameTableUnit
     char name[MAX_NAME_LEN];
     size_t id_index;
     UnitNameTableTypes type;
+    int init;
     };
 
 
@@ -86,6 +87,10 @@ void AddToNameTableIfNotFind(LangNameTable* name_table, char* name, size_t numbe
 
 NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data);
 
+NameTableError GetGlobalAndLocalsTable(LangNameTableArray* table_array, Text* data, size_t* index);
+
+size_t GetGeneralTable(LangNameTableArray* table_array, Text* data);
+
 NameTableError GetString(Text* data, char** string, size_t* i);
 
-int SkipSpacesAndEndOfString(Text* data, size_t i);
+void CheckTableArraySize(LangNameTableArray* table_array);

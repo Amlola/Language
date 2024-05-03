@@ -11,34 +11,6 @@
             return errors;                      \
 
 
-const char* GetKeyword(Node_t* node) 
-    {
-    assert(node);
-
-    printf("%d\n", node->kind.form.key_w);
-
-    for (size_t i = 0; i < NUMBER_OF_KEYWORD; i++) 
-        {
-        if (node->kind.form.key_w == keyword_array[i].num)
-            return keyword_array[i].name;
-        }
-    
-    return nullptr;
-    }
-
-
-const char* GetKeywordByNumber(int number_keyword) 
-    {
-    for (size_t i = 0; i < NUMBER_OF_KEYWORD; i++) 
-        {
-        if (number_keyword == keyword_array[i].num)
-            return keyword_array[i].name;
-        }
-
-    return nullptr;
-    }
-
-
 ReverseErrors GetMySyntax(Node_t* node, FILE* file) 
     {
     assert(node);

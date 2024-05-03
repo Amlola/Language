@@ -30,15 +30,27 @@ int main(int argc, char* argv[])
 
     GetTokens(&analyz, &tokens, &table_array.Array[GENERAL_TABLE_INDEX]);
 
-    printf("\n");
-
     free(analyz.Buf);
+
+    if (analyz.count_n == 0)
+        {
+        NameTableArrayDtor(&table_array);
+        ListDtor(&tokens);
+        return SYNTAX_ERROR;
+        }
 
     Tree tree = {};
 
     TreeCtor(&tree);
 
     tree.root = GetGlobalNameTable(&tokens, &table_array);
+
+    if (!tree.root)
+        {
+        printf("ALL IS BAD\n");
+        FrontDtor(&tree, &tokens, &table_array);
+        return SYNTAX_ERROR;
+        }
 
     TreeDump(&tree, tree.root);
 
@@ -56,13 +68,19 @@ int main(int argc, char* argv[])
 
     WriteNameTableArrayToFile(name_table_file, &table_array);
 
-    NameTableArrayDtor(&table_array);
-
-    TreeDtor(&tree);
-
-    ListDtor(&tokens);
+    FrontDtor(&tree, &tokens, &table_array);
 
     printf("ALL IS GOOD\n");
 
     return 0;
+    }
+
+
+void FrontDtor(Tree* tree, LIST* list, LangNameTableArray* table_array) 
+    {
+    NameTableArrayDtor(table_array);
+
+    TreeDtor(tree);
+
+    ListDtor(list);
     }

@@ -1,36 +1,44 @@
 digraph struct {bgcolor=RosyBrown rankdir = HR
 
 
-label = "tree_dump from function int main(int, char**), Tree/src/main.cpp:48";
+label = "tree_dump from function int main(int, char**), Tree/src/main.cpp:52";
 node0[shape=record, style=filled, fillcolor="red", label=" {ADDRESS: 0x6080000000a0 | DATA: ; | PARENT: (nil) | LEFT: 0x608000000120 | RIGHT: (nil) | TYPE: keyw_type}"];
 node0->node1 [color = "lime"];
 node1[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000120 | DATA: main | PARENT: (nil) | LEFT: 0x6080000001a0 | RIGHT: 0x608000000220 | TYPE: func_def_type}"];
 node1->node2 [color = "lime"];
 node2[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x6080000001a0 | DATA: int | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: keyw_type}"];
 node1->node3 [color = "aqua"];
-node3[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000220 | PARENT: (nil) | LEFT: 0x6080000002a0 | RIGHT: 0x6080000006a0 | TYPE: param_type}"];
+node3[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000220 | PARENT: (nil) | LEFT: 0x6080000002a0 | RIGHT: 0x6080000008a0 | TYPE: param_type}"];
 node3->node4 [color = "lime"];
 node4[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x6080000002a0 | DATA: , | PARENT: (nil) | LEFT: 0x608000000320 | RIGHT: 0x6080000004a0 | TYPE: keyw_type}"];
 node4->node5 [color = "lime"];
-node5[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000320 | DATA: b | PARENT: (nil) | LEFT: 0x6080000003a0 | RIGHT: 0x608000000420 | TYPE: var_decl_type}"];
+node5[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000320 | DATA: a | PARENT: (nil) | LEFT: 0x6080000003a0 | RIGHT: 0x608000000420 | TYPE: var_decl_type}"];
 node5->node6 [color = "lime"];
 node6[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x6080000003a0 | DATA: int | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: keyw_type}"];
 node5->node7 [color = "aqua"];
-node7[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000420 | DATA: b | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
+node7[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000420 | DATA: a | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
 node4->node8 [color = "aqua"];
-node8[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000004a0 | DATA: , | PARENT: (nil) | LEFT: 0x608000000520 | RIGHT: (nil) | TYPE: keyw_type}"];
+node8[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000004a0 | DATA: , | PARENT: (nil) | LEFT: 0x608000000520 | RIGHT: 0x6080000006a0 | TYPE: keyw_type}"];
 node8->node9 [color = "lime"];
-node9[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000520 | DATA: a | PARENT: (nil) | LEFT: 0x6080000005a0 | RIGHT: 0x608000000620 | TYPE: var_decl_type}"];
+node9[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000520 | DATA: b | PARENT: (nil) | LEFT: 0x6080000005a0 | RIGHT: 0x608000000620 | TYPE: var_decl_type}"];
 node9->node10 [color = "lime"];
 node10[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x6080000005a0 | DATA: int | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: keyw_type}"];
 node9->node11 [color = "aqua"];
-node11[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000620 | DATA: a | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
-node3->node12 [color = "aqua"];
-node12[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000006a0 | DATA: ; | PARENT: (nil) | LEFT: 0x608000000720 | RIGHT: (nil) | TYPE: keyw_type}"];
+node11[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000620 | DATA: b | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
+node8->node12 [color = "aqua"];
+node12[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000006a0 | DATA: , | PARENT: (nil) | LEFT: 0x608000000720 | RIGHT: (nil) | TYPE: keyw_type}"];
 node12->node13 [color = "lime"];
-node13[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000720 | DATA: print | PARENT: (nil) | LEFT: (nil) | RIGHT: 0x6080000007a0 | TYPE: keyw_type}"];
-node13->node14 [color = "aqua"];
-node14[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000007a0 | DATA: a | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
+node13[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000720 | DATA: c | PARENT: (nil) | LEFT: 0x6080000007a0 | RIGHT: 0x608000000820 | TYPE: var_decl_type}"];
+node13->node14 [color = "lime"];
+node14[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x6080000007a0 | DATA: int | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: keyw_type}"];
+node13->node15 [color = "aqua"];
+node15[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x608000000820 | DATA: c | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
+node3->node16 [color = "aqua"];
+node16[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000008a0 | DATA: ; | PARENT: (nil) | LEFT: 0x608000000920 | RIGHT: (nil) | TYPE: keyw_type}"];
+node16->node17 [color = "lime"];
+node17[shape=record, style=filled, fillcolor="lime", label=" {ADDRESS: 0x608000000920 | DATA: print | PARENT: (nil) | LEFT: (nil) | RIGHT: 0x6080000009a0 | TYPE: keyw_type}"];
+node17->node18 [color = "aqua"];
+node18[shape=record, style=filled, fillcolor="aqua", label=" {ADDRESS: 0x6080000009a0 | DATA: a | PARENT: (nil) | LEFT: (nil) | RIGHT: (nil) | TYPE: id_type}"];
 
 
 }

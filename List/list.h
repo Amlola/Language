@@ -53,6 +53,8 @@ struct Token
         double num;
         char id[WORD_MAX_LEN];
         }form;
+
+    size_t line;
     };
 
 
@@ -110,6 +112,7 @@ typedef struct
     ListError CodeError;
     const char* NameError;
     }LIST_STATUS;
+    
 
 const LIST_STATUS ErrorArray[] = 
     {

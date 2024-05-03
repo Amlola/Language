@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
 
     FileInput(file_input, &analyz);
 
+/*--------------------------------------------------------------*/
+
     FILE* name_table_file = fopen(argv[2], "r");
 
     CHECK_FILE(name_table_file, argv[2]);
@@ -31,7 +33,9 @@ int main(int argc, char* argv[])
 
     GetNameTableArray(&table_array, &data_name_table);
 
-    Tree tree = {};
+/*--------------------------------------------------------------*/
+
+    /*Tree tree = {};
 
     TreeCtor(&tree);
 
@@ -45,7 +49,9 @@ int main(int argc, char* argv[])
 
     fclose(lang_file);
 
-    TreeDump(&tree, tree.root);
+    TreeDump(&tree, tree.root);*/
+
+/*---------------------------------------------------------------*/
 
     free(analyz.Buf);
 
@@ -53,7 +59,7 @@ int main(int argc, char* argv[])
 
     NameTableArrayDtor(&table_array);
 
-    TreeDtor(&tree);
+    //TreeDtor(&tree);
 
     printf("ALL IS GOOD\n");
 

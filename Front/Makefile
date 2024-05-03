@@ -1,4 +1,4 @@
-SANIT_FLAGS = -fsanitize=address,alignment,undefined
+SANIT_FLAGS = #-fsanitize=address,undefined
 OPT_FLAG = -O2
 DEBUG = -D DUMP
 

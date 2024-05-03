@@ -15,6 +15,8 @@ NameTableError NameTableCtor(LangNameTable* name_table)
 
     name_table->capacity = NAME_TABLE_CAPACITY;
 
+    name_table->Table->init = 0;
+
     return NO_NAME_TABLE_ERROR;
     }
 
@@ -192,31 +194,51 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
 
     NameTableError error = NO_NAME_TABLE_ERROR;
 
-    fprintf(name_table_file, "%zu\n", table_array->Array[0].ptr);
-    for (size_t j = 0; j < table_array->Array[0].ptr; j++)
-        fprintf(name_table_file, "%s\n", table_array->Array[0].Table[j].name);
+    fprintf(name_table_file, "%zu\n", table_array->Array[GENERAL_TABLE_INDEX].ptr);
+
+    for (size_t j = 0; j < table_array->Array[GENERAL_TABLE_INDEX].ptr; j++)
+        fprintf(name_table_file, "%s\n", table_array->Array[GENERAL_TABLE_INDEX].Table[j].name);
 
     fprintf(name_table_file, "\n");
 
-    fprintf(name_table_file, "%zu\n\n", table_array->ptr);
+    size_t number_local_table = 0;
 
-    fprintf(name_table_file, "%zu %d\n", table_array->Array[1].ptr, table_array->Array[1].table_number);
-    for (size_t j = 0; j < table_array->Array[1].ptr; j++)
+    for (size_t i = 0; i < table_array->Array[GLOBAL_TABLE_INDEX].ptr; i++)
         {
-        fprintf(name_table_file, "%zu %d\n", table_array->Array[1].Table[j].id_index, table_array->Array[1].Table[j].type);
-        table_array->Array[j + 2].table_number = table_array->Array[1].Table[j].id_index;
+        if (table_array->Array[GLOBAL_TABLE_INDEX].Table[i].type != VAR_NAME)
+            number_local_table++;
+        }   
+
+    fprintf(name_table_file, "%zu\n\n", number_local_table);
+
+    fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].ptr, 
+                                         table_array->Array[GLOBAL_TABLE_INDEX].table_number);
+
+    for (size_t j = 0; j < table_array->Array[GLOBAL_TABLE_INDEX].ptr; j++)
+        {
+        fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].Table[j].id_index, 
+                                             table_array->Array[GLOBAL_TABLE_INDEX].Table[j].type);
+
+        table_array->Array[j + 2].table_number = table_array->Array[GLOBAL_TABLE_INDEX].Table[j].id_index;
         }
 
     fprintf(name_table_file, "\n");
 
-    for (size_t i = 2; i <= table_array->ptr; i++)
+    size_t i = 2;
+
+    while (i <= table_array->ptr)
         {
-        fprintf(name_table_file, "%zu %d\n", table_array->Array[i].ptr, table_array->Array[i].table_number);
+        if (table_array->Array[GLOBAL_TABLE_INDEX].Table[i - 2].type != VAR_NAME)
+            {
+            fprintf(name_table_file, "%zu %d\n", table_array->Array[i].ptr, table_array->Array[i].table_number);
 
-        if ((error = WriteNameTableToFile(name_table_file, &(table_array->Array[i]))))
-            return error;
+            if ((error = WriteNameTableToFile(name_table_file, &(table_array->Array[i]))))
+                return error;
 
-        fprintf(name_table_file, "\n");
+            fprintf(name_table_file, "\n");
+            }
+        
+        i++;
         }
 
     fclose(name_table_file);
@@ -237,14 +259,107 @@ NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table)
     }
 
 
-NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data)
+NameTableError GetGlobalAndLocalsTable(LangNameTableArray* table_array, Text* data, size_t* index)
     {
     assert(table_array);
     assert(data);
 
-    size_t general_table_size = GET_NUMBER(0);
+    size_t locals_table_size = 0;
+    int check = 0;
 
-    size_t i = WORD_BEGIN_INDEX;
+    sscanf(data->Buf + *index, "%zu%n", &locals_table_size, &check);
+    (*index) += check;
+    (*index) = SkipEndOfString(data, *index);
+
+    printf("locals_table_size: %zu\n", locals_table_size);
+   
+    size_t global_table_size = 0;
+
+    sscanf(data->Buf + *index, "%zu%n", &global_table_size, &check);
+    (*index) += check + 1;
+
+    LangNameTable* global_table = &table_array->Array[GLOBAL_TABLE_INDEX];
+    NameTableCtor(global_table);
+
+    printf("global_table_size: %zu\n", global_table_size);
+
+    global_table->table_number = -1;
+    (*index) += 2;
+    (*index) = SkipEndOfString(data, *index);
+
+    printf("global_table->table_number: %d\n", global_table->table_number);
+
+    for (size_t i = 0; i < global_table_size; i++)
+        {
+        size_t id_index = 0;
+
+        sscanf(data->Buf + *index, "%zu%n", &id_index, &check);
+        (*index) += check + 1;
+
+        printf("GLOBAL ID_INDEX IN GENERAL: %zu\n", id_index);
+
+        AddToNameTable(global_table, table_array->Array[GENERAL_TABLE_INDEX].Table[id_index].name, 
+                        id_index, (UnitNameTableTypes)(GET_NUMBER(*index)));
+
+        (*index)++;
+        (*index) = SkipEndOfString(data, *index);
+        }
+
+    table_array->ptr++;
+
+    for (size_t table_number = 2; table_number < (locals_table_size + 2); table_number++) 
+        {        
+        NameTableCtor(&table_array->Array[table_number]);
+        CheckTableArraySize(table_array);
+
+        size_t current_table_size = 0;
+
+        sscanf(data->Buf + *index, "%zu%n", &current_table_size, &check);
+        (*index) += check + 1;
+
+        printf("current_table_size %zu\n", current_table_size);
+
+        sscanf(data->Buf + *index, "%d%n", &table_array->Array[table_number].table_number, &check);
+        (*index) += check;
+        (*index) = SkipEndOfString(data, *index);
+
+        printf("table_array->Array[table_number].table_number %d\n", table_array->Array[table_number].table_number);
+
+        size_t id_index = 0;
+
+        for (size_t current_ident = 0; current_ident < current_table_size; current_ident++) 
+            { 
+            sscanf(data->Buf + *index, "%zu%n", &id_index, &check);
+            (*index) += check + 1;
+
+            printf("ID_INDEX IN GENERAL: %zu\n", id_index);
+
+            AddToNameTable(&table_array->Array[table_number], table_array->Array[GENERAL_TABLE_INDEX].Table[id_index].name, 
+                           id_index, (UnitNameTableTypes)(GET_NUMBER(*index)));
+
+            (*index)++;
+            (*index) = SkipEndOfString(data, *index);
+            }
+        } 
+
+    return NO_NAME_TABLE_ERROR;
+    }
+
+
+size_t GetGeneralTable(LangNameTableArray* table_array, Text* data)
+    {
+    assert(table_array);
+    assert(data);
+
+    size_t general_table_size = 0;
+    size_t i = 0;
+
+    int check = 0;
+    sscanf(data->Buf, "%zu%n", &general_table_size, &check);
+    i += check;
+    i = SkipEndOfString(data, i);
+
+    printf("General: %zu\n", general_table_size);
 
     LangNameTable* general_table = &table_array->Array[GENERAL_TABLE_INDEX];
 
@@ -256,64 +371,24 @@ NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data)
 
         GetString(data, &string, &i);
 
+        printf("IDENT: %s\n", string);
+
         AddToNameTable(general_table, string, GENERAL_TABLE_INDEX, GENERAL_TYPE);
         }
 
-    i++;
-
-    size_t number_of_table = GET_NUMBER(i);
-
-    i += 3;
-
     table_array->ptr = 1;
 
-    for (size_t table_number = 1; table_number <= number_of_table; table_number++) 
-        {        
-        NameTableCtor(&table_array->Array[table_number]);
+    return SkipEndOfString(data, i);;
+    }
 
-        table_array->ptr++;
 
-        if (table_array->ptr >= table_array->capacity)
-            NameTableArrayRealloc(table_array);
+NameTableError GetNameTableArray(LangNameTableArray* table_array, Text* data)
+    {
+    size_t number_string = 0;
 
-        size_t current_table_size = GET_NUMBER(i);
+    size_t i = GetGeneralTable(table_array, data);
 
-        printf("CURR_SIZE_TABLE: %zu\n", current_table_size);
-
-        i += SPACE_MAGNIFICATION;
-
-        if (table_number == GLOBAL_TABLE_INDEX)
-            {
-            table_array->Array[table_number].table_number = -1;
-            i += 3;
-            }
-
-        else
-            {
-            table_array->Array[table_number].table_number = GET_NUMBER(i);
-            i += SPACE_MAGNIFICATION;
-            }
-
-        printf("TABLE_NUMBER: %d\n", table_array->Array[table_number].table_number);
-
-        int id_index = 0;
-
-        for (size_t current_ident = 0; current_ident < current_table_size; current_ident++) 
-            { 
-            id_index = GET_NUMBER(i);
-
-            printf("ID_INDEX: %d\n", id_index);
-
-            i += SPACE_MAGNIFICATION;
-
-            AddToNameTable(&table_array->Array[table_number], general_table->Table[id_index].name, 
-                           id_index, (UnitNameTableTypes)(GET_NUMBER(i)));
-
-            i += SPACE_MAGNIFICATION;
-            }
-
-        i++;
-        } 
+    GetGlobalAndLocalsTable(table_array, data, &i);
 
     return NO_NAME_TABLE_ERROR;
     }
@@ -341,4 +416,13 @@ NameTableError GetString(Text* data, char** string, size_t* i)
     (*i)++;
     
     return NO_NAME_TABLE_ERROR;
+    }
+
+
+void CheckTableArraySize(LangNameTableArray* table_array) 
+    {
+    table_array->ptr++;
+
+    if (table_array->ptr >= table_array->capacity)
+        NameTableArrayRealloc(table_array);
     }

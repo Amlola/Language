@@ -40,13 +40,15 @@ int GetWord(Text* data, char word[WORD_MAX_LEN], size_t* i)
     }
 
 
-void GetTokensFromOneString(LIST* tokens, Text* data, size_t* i, LangNameTable* general_table) 
+void GetTokensFromOneString(LIST* tokens, Text* data, size_t* i, LangNameTable* general_table, size_t number_string) 
     { 
     *i = SkipSpaces(data, *i);
 
     while (data->Buf[*i] != '\0') 
         {
-        Token token = {};
+        List_type token = {};
+
+        token.line = number_string + 1;
 
         *i = SkipSpaces(data, *i);
 
@@ -93,6 +95,18 @@ void GetTokensFromOneString(LIST* tokens, Text* data, size_t* i, LangNameTable* 
             token.type = NUM_TYPE;
 
             (*i) += check;
+
+            if (isalpha(data->Buf[*i]))
+                {
+                char word[WORD_MAX_LEN] = "";
+
+                GetWord(data, word, i);
+
+                fprintf(stderr, "error: identifier '%s' must start with a letter\n", word);
+
+                data->count_n = 0;
+                return;
+                }
             }
 
         else 
@@ -127,7 +141,7 @@ void GetTokensFromOneString(LIST* tokens, Text* data, size_t* i, LangNameTable* 
             
             if (sign == -1)
                 {
-                fprintf(stderr, "ERROR: UNEXPECTED_LEXEM %c\n", data->Buf[*i]);
+                fprintf(stderr, "error: unexpected lexeme %c\n", data->Buf[*i]);
 
                 return;
                 }
@@ -147,16 +161,20 @@ int GetTokens(Text* data, LIST* tokens, LangNameTable* general_table)
     {
     size_t i = 0;
 
-    for (size_t number_string = 0; number_string < data->count_n; number_string++) 
-        {
-        GetTokensFromOneString(tokens, data, &i, general_table);
+    size_t number_string = 0;
+
+    for (number_string = 0; number_string < data->count_n; number_string++) 
+        { 
+        GetTokensFromOneString(tokens, data, &i, general_table, number_string);
 
         i++;
         }
 
-    Token token = {};
+    List_type token = {};
 
     token.type = KEYW_TYPE;
+
+    token.line = number_string;
 
     token.form.key_w = KEYW_ENDOF;
 

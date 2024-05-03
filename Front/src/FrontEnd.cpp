@@ -2,7 +2,25 @@
 
 
 #define GET_TOKEN_VALUE tokens->data[Begin(tokens)].value
-#define ADD_TO_GLOBAL_TABLE AddToNameTableIfNotFind(&table_array->Array[GLOBAL_TABLE_INDEX], name_func.form.id, FindInNameTable(&table_array->Array[GENERAL_TABLE_INDEX], name_func.form.id), FUNC_NAME)
+
+#define ADD_TO_GLOBAL_TABLE(type)                                                                                    \
+        AddToNameTableIfNotFind(&table_array->Array[GLOBAL_TABLE_INDEX], name_func.form.id,                          \
+                                FindInNameTable(&table_array->Array[GENERAL_TABLE_INDEX], name_func.form.id), type); \
+        CheckTableArraySize(table_array);                                                                            \
+
+#define PRINT_SYNTAX_ERROR(line, str_message, str_error)              \
+        fprintf(stderr, "line: %zu\n", line);                         \
+        fprintf(stderr, "error: %s '%s'\n", str_message, str_error);  \
+
+#define FIND_SYNTAX_ERROR(ptr)       \
+        if (!ptr)                    \
+            return nullptr;          \
+
+#define CREATE_OPERATION_NODE CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr)
+#define PRINT_OR_IDENT (oper.type == KEYW_TYPE && (oper.form.key_w == KEYW_PRINTF)) || oper.type == ID_TYPE
+
+
+/*----------------------------------------------------PARSER--------------------------------------------------------*/
 
 
 Node_t* GetGlobalNameTable(LIST* tokens, LangNameTableArray* table_array) 
@@ -19,7 +37,11 @@ Node_t* GetGlobalNameTable(LIST* tokens, LangNameTableArray* table_array)
 
 Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array)
     {
+    printf("I AM IN GET GRAMMAR\n\n");
+
     Node_t* func = GetDefFunc(tokens, table_array);
+
+    FIND_SYNTAX_ERROR(func);
 
     List_type fict_token = GetFictToken();
 
@@ -27,11 +49,7 @@ Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array)
         return CreateNode(fict_token, KEYW_TYPE, func, nullptr);
     
     else 
-        {
-        //Node_t* fict_node = CreateNode(fict_token, KEYW_TYPE, GetGrammar(tokens, table_array), nullptr);
-
         func = CreateNode(fict_token, KEYW_TYPE, func, GetGrammar(tokens, table_array));
-        }
 
 	return func;
     }
@@ -39,9 +57,9 @@ Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array)
 
 Node_t* GetDefFunc(LIST* tokens, LangNameTableArray* table_array) 
     {
-	printf("I AM IN DEF FUNC\n");
+    printf("I AM IN DEF_FUNC\n");
 
-    CheckValidFunc(tokens);
+    FIND_SYNTAX_ERROR(CheckInitialization(GET_TOKEN_VALUE));
 
 	List_type type = GET_TOKEN_VALUE;
 
@@ -49,31 +67,40 @@ Node_t* GetDefFunc(LIST* tokens, LangNameTableArray* table_array)
 
     List_type name_func = GET_TOKEN_VALUE;
 
-    ADD_TO_GLOBAL_TABLE;
+    FIND_SYNTAX_ERROR(CheckIdName(name_func))
 
-    CheckTableArraySize(table_array);
+    Node_t* global_var = GetGlobalVariable(tokens, table_array, name_func, type);
+
+    if (global_var)
+        {
+        PopFront(tokens);
+
+        ADD_TO_GLOBAL_TABLE(VAR_NAME);
+
+        return global_var;
+        }
+
+    ADD_TO_GLOBAL_TABLE(FUNC_NAME);
 
     NameTableCtor(&(table_array->Array[table_array->ptr]));
 
     PopFront(tokens);
 
-/*--------------------GetParameters---------------------*/
-
-    CheckOpenRoundBracket(tokens);
+    FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));
 
     Node_t* left = GetParamSequence(tokens, table_array);
 
-    CheckCloseRoundBracket(tokens);
+    FIND_SYNTAX_ERROR(left);
 
-/*---------------------GetFuncBody----------------------*/
+    FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
-    CheckOpenFigBracket(tokens);
+    FIND_SYNTAX_ERROR(CheckOpenFigBracket(tokens));
 
     Node_t* right = GetOperatorsSequence(tokens, table_array);
 
-	CheckCloseFigBracket(tokens);
+    FIND_SYNTAX_ERROR(right);
 
-/*------------------------------------------------------*/
+	FIND_SYNTAX_ERROR(CheckCloseFigBracket(tokens));
 
 	Node_t* type_func = CreateNode(type, KEYW_TYPE, nullptr, nullptr);
 
@@ -83,11 +110,34 @@ Node_t* GetDefFunc(LIST* tokens, LangNameTableArray* table_array)
     }
 
 
+Node_t* GetGlobalVariable(LIST* tokens, LangNameTableArray* table_array, List_type var_name, List_type var_type)
+    {
+    printf("I AM IN GLOBAL VARS\n");
+
+    PopFront(tokens);
+
+    Node_t* rValue = CreateNode(var_name, ID_TYPE, nullptr, nullptr);
+
+    Node_t* type = CreateNode(var_type, KEYW_TYPE, nullptr, nullptr);
+
+    Node_t* var = CheckAssign(tokens, table_array, var_name, var_type, rValue, type);
+
+    if (var)
+        return var;
+
+    PushFront(tokens, var_name);
+
+    return nullptr;
+    }
+
+
 Node_t* GetOperatorsSequence(LIST* tokens, LangNameTableArray* table_array)
     {   
-	printf("I AM IN OP Sequence\n");	
+    printf("I AM IN GET OPERATOR SEQ\n");
 
 	Node_t* first_oper = GetOperator(tokens, table_array);
+
+    FIND_SYNTAX_ERROR(first_oper);
     
 	Node_t* current_oper = first_oper;
 
@@ -95,7 +145,20 @@ Node_t* GetOperatorsSequence(LIST* tokens, LangNameTableArray* table_array)
         {		
 		PopFront(tokens);
 
+        if (GET_TOKEN_VALUE.form.key_w == KEYW_ENDOF)
+            {
+            PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line, "missing closing bracket", "sent");
+            return nullptr;
+            }
+
+        if (GET_TOKEN_VALUE.form.key_w == KEYW_CLFIG)
+            return first_oper;
+
+        printf("I AM IN GET OPERATOR SEQ2\n");
+
 		Node_t* second_oper = GetOperator(tokens, table_array);
+
+        FIND_SYNTAX_ERROR(second_oper);
 
         current_oper->right = second_oper;   
 
@@ -108,116 +171,178 @@ Node_t* GetOperatorsSequence(LIST* tokens, LangNameTableArray* table_array)
 
 Node_t* GetOperator(LIST* tokens, LangNameTableArray* table_array)
     {
-	printf("I AM IN GET OPERATOR\n");
+    printf("I AM IN GET OPERATOR\n");
 
 	List_type oper = GET_TOKEN_VALUE;
 
+    Node_t* oper_node = nullptr;
+
 	List_type fict_token = GetFictToken();
 
-	if (oper.form.key_w == KEYW_WHILE  || oper.form.key_w == KEYW_IF    || 
-        oper.form.key_w == KEYW_RETURN || oper.form.key_w == KEYW_INIT  || 
-        oper.form.key_w == KEYW_PRINTF || oper.form.key_w == KEYW_INPUT ||
-        oper.type       == ID_TYPE)
+    if (oper.type == NUM_TYPE)
+        {
+        fprintf(stderr, "line: %zu\n", oper.line);
+        fprintf(stderr, "error: unknown use of number\n");
+        return nullptr;
+        }
 
+    if (PRINT_OR_IDENT)
+        {
+        Node_t* oper_node = GetNotInitToken(tokens, table_array);
+
+        FIND_SYNTAX_ERROR(oper_node);
+
+        return CREATE_OPERATION_NODE;
+        }
+
+	if (CheckOperators(oper))
 	    {
-		if (oper.form.key_w == KEYW_WHILE)
-		    {
-			Node_t* oper_node = GetWhile(tokens, table_array);
+        switch (oper.form.key_w)
+            {
+            case KEYW_WHILE:
+                {
+                oper_node = GetWhile(tokens, table_array);
+                
+                break;
+                }
 
-			return CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr);
-		    }	
+            case KEYW_IF:
+                {
+                oper_node = GetIf(tokens, table_array);
+                break;
+                }
 
-		else if (oper.form.key_w == KEYW_IF)
-		    {
-			Node_t* oper_node = GetIf(tokens, table_array);
+            case KEYW_RETURN:
+                {
+                oper_node = GetReturn(tokens, table_array);
+                break;
+                }
 
-			return CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr);
-		    }	
+            case KEYW_INIT:
+                {
+                oper_node = GetInit(tokens, table_array);
+                break;
+                }
 
-		else if (oper.form.key_w == KEYW_RETURN)
-		    {
-            Node_t* oper_node = GetReturn(tokens, table_array);
+            case KEYW_BREAK:
+                {
+                oper_node = GetCyclesOperators(tokens, oper);
+                break;
+                }
+                        
+            case KEYW_CONTINUE:
+                {
+                oper_node = GetCyclesOperators(tokens, oper);
+                break;
+                }
             
-			return CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr);
-		    }
+            default:
+                {
+                return nullptr;
+                break;
+                }
+            }
+        }
 
-		else if (oper.form.key_w == KEYW_INIT)
-		    {
-            Node_t* oper_node = GetInit(tokens, table_array);
+    FIND_SYNTAX_ERROR(oper_node);
 
-			return CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr);
-		    }
+	return CREATE_OPERATION_NODE;
+    }
 
-		else 
-		    {
-            Node_t* oper_node = GetNotInitToken(tokens, table_array);
 
-			return CreateNode(fict_token, KEYW_TYPE, oper_node, nullptr);
-		    }
+Node_t* GetCyclesOperators(LIST* tokens, List_type token) 
+    {
+    Node_t* oper_node = CreateNode(token, KEYW_TYPE, nullptr, nullptr);
 
-	    }
+    PopFront(tokens);
 
-	return nullptr;
+    FIND_SYNTAX_ERROR(CheckSequentialOperator(GET_TOKEN_VALUE));
+
+    return oper_node;
     }
 
 
 Node_t* GetInit(LIST* tokens, LangNameTableArray* table_array)
-    {
-	printf("I AM IN GET_INIT\n");
-	
+    {	
+    printf("I AM IN GET INIT\n");                             
+
     List_type type_var = GET_TOKEN_VALUE;
 
 	Node_t* type = CreateNode(type_var, KEYW_TYPE, nullptr, nullptr);
 
 	PopFront(tokens);
 
-	CheckIdName(tokens);
+    List_type var_name = GET_TOKEN_VALUE;
 
-	List_type var_name = GET_TOKEN_VALUE;
+	FIND_SYNTAX_ERROR(CheckIdName(var_name));
 
 	Node_t* rValue = GetVar(tokens, table_array);
 
-	if (GET_TOKEN_VALUE.form.key_w == KEYW_ASSIGN)
-	    {
-        List_type assign_token = GET_TOKEN_VALUE;
+    FIND_SYNTAX_ERROR(GetInitVarInNameTable(table_array, var_name));
 
-		PopFront(tokens);
+	Node_t* var = CheckAssign(tokens, table_array, var_name, type_var, rValue, type);
 
-		Node_t* lValue = GetAddSub(tokens, table_array);
-
-		Node_t* assign_node = CreateNode(assign_token, KEYW_TYPE, lValue, rValue);
-
-		return CreateNode(var_name, VAR_DECL_TYPE, type, assign_node);
-	    }
+    if (var)
+        return var;
 
 	else
-		return CreateNode(var_name, VAR_DECL_TYPE, nullptr, rValue);
+        {
+        PRINT_SYNTAX_ERROR(var_name.line, "you need to initialize variable", var_name.form.id);
+		return nullptr;
+        }
     }
 
 
 Node_t* GetNotInitToken(LIST* tokens, LangNameTableArray* table_array)
     {
     printf("I AM IN GET NOT INIT\n");
-
 	List_type func = GET_TOKEN_VALUE;
 
 	PopFront(tokens);
 
 	if (GET_TOKEN_VALUE.form.key_w == KEYW_OPRND)
-		return GetFunc(tokens, func, table_array);
+        {
+        if (func.type == ID_TYPE)
+            FIND_SYNTAX_ERROR(CheckIdName(func));
 
-	else                                                            // if not call_func, var = ...;
-	    {
-		PushFront(tokens, func);
+        Node_t* func_node = GetFunc(tokens, func, table_array);
 
-		return GetAssign(tokens, table_array);
-	    }
+        FIND_SYNTAX_ERROR(CheckSequentialOperator(GET_TOKEN_VALUE));
+
+		return func_node;
+        }
+
+	else
+        {
+        LangNameTable* table = &table_array->Array[table_array->ptr];
+
+        size_t pos = FindInNameTable(table, func.form.id);
+
+        size_t global_pos = FindInNameTable(&table_array->Array[GLOBAL_TABLE_INDEX], func.form.id);
+
+        if (pos != -1 && table->Table[pos].init == 1 || global_pos != -1)
+            {
+            PushFront(tokens, func);
+
+            Node_t* assign = GetAssign(tokens, table_array);
+
+            FIND_SYNTAX_ERROR(CheckSequentialOperator(GET_TOKEN_VALUE));
+
+            return assign;
+            }
+        
+        else 
+            {
+            PRINT_SYNTAX_ERROR(func.line, "uninitialized variable", func.form.id);
+            return nullptr;
+            }
+        }                                                          
     }
 
 
-Node_t* GetBaseFunc(LIST* tokens, LangNameTableArray* table_array)  // unary and input()
+Node_t* GetBaseFunc(LIST* tokens, LangNameTableArray* table_array)
     {
-	printf("I AM IN BASE FUNC\n");
+    printf("I AM IN BASE FUNC\n");
 
 	List_type func = GET_TOKEN_VALUE;
 
@@ -233,7 +358,7 @@ Node_t* GetBaseFunc(LIST* tokens, LangNameTableArray* table_array)  // unary and
     }
 
 
-Node_t* GetFunc(LIST* tokens, List_type func, LangNameTableArray* table_array)  // functions and printf()
+Node_t* GetFunc(LIST* tokens, List_type func, LangNameTableArray* table_array)
     {
 	printf("I AM IN GET_FUNC\n");
 
@@ -243,16 +368,13 @@ Node_t* GetFunc(LIST* tokens, List_type func, LangNameTableArray* table_array)  
 
 	Node_t* arg_branch = GetArgumentSequence(tokens, table_array);
 
-	CheckCloseRoundBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
 	if (func.type == KEYW_TYPE)
 		return CreateNode(func, KEYW_TYPE, nullptr, arg_branch);
 
 	else if (func.type == ID_TYPE)
 		return CreateNode(func, CALL_TYPE, arg_branch, name_func);
-
-	else
-		fprintf(stderr, "Error: bad arguments in function\n");
     
     return nullptr;
     }
@@ -331,7 +453,7 @@ Node_t* GetLogicalExpression(LIST* tokens, LangNameTableArray* table_array)
 
 		Node_t* expression = GetOr(tokens, table_array);
 
-		CheckCloseRoundBracket(tokens);
+		FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
 		return expression;
 	    }
@@ -430,7 +552,7 @@ Node_t* GetExpression(LIST* tokens, LangNameTableArray* table_array)
 
 		Node_t* expression = GetAddSub(tokens, table_array);
 
-		CheckCloseRoundBracket(tokens);
+		FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
 		return expression;
 	    }
@@ -458,7 +580,8 @@ Node_t* GetAssign(LIST* tokens, LangNameTableArray* table_array)
 	    }
 
 	else
-		fprintf(stderr, "Unknown operator\n");
+        fprintf(stderr, "line: %zu\n", GET_TOKEN_VALUE.line);
+		fprintf(stderr, "error: unknown operator\n");
 
     return nullptr;
     }
@@ -470,17 +593,19 @@ Node_t* GetWhile(LIST* tokens, LangNameTableArray* table_array)
 
 	PopFront(tokens);
 
-	CheckOpenRoundBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));
 
 	Node_t* state_while = GetOr(tokens, table_array);
 
-	CheckCloseRoundBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
-	CheckOpenFigBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckOpenFigBracket(tokens));
 
 	Node_t* body_while = GetOperatorsSequence(tokens, table_array);
 
-	CheckCloseFigBracket(tokens);
+    FIND_SYNTAX_ERROR(body_while);
+
+	FIND_SYNTAX_ERROR(CheckCloseFigBracket(tokens));
 
 	List_type while_branch = {};
 
@@ -492,6 +617,10 @@ Node_t* GetWhile(LIST* tokens, LangNameTableArray* table_array)
 
     PushFront(tokens, fict_token);
 
+    LangNameTable* table = &table_array->Array[table_array->ptr];
+
+    BeginningOfInitVar(table);
+
 	return CreateNode(while_branch, KEYW_TYPE, state_while, body_while);
     }
 
@@ -502,19 +631,25 @@ Node_t* GetIf(LIST* tokens, LangNameTableArray* table_array)
 
 	PopFront(tokens);
 
-	CheckOpenRoundBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));
 
 	Node_t* state_if = GetOr(tokens, table_array);
 
-	CheckCloseRoundBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
 	Node_t* body_if = GetElse(tokens, table_array);
+
+    FIND_SYNTAX_ERROR(body_if);
 
 	List_type if_type = {};
 
 	if_type.type = KEYW_TYPE;                                 
 
 	if_type.form.key_w = KEYW_IF;
+
+    LangNameTable* table = &table_array->Array[table_array->ptr];
+
+    BeginningOfInitVar(table);
 
 	return CreateNode(if_type, KEYW_TYPE, state_if, body_if);
     }
@@ -524,11 +659,11 @@ Node_t* GetElse(LIST* tokens, LangNameTableArray* table_array)
     {
 	printf("I AM IN ELSE\n");
 
-	CheckOpenFigBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckOpenFigBracket(tokens));
 
 	Node_t* if_branch = GetOperatorsSequence(tokens, table_array);
 
-	CheckCloseFigBracket(tokens);
+	FIND_SYNTAX_ERROR(CheckCloseFigBracket(tokens));
 
 	if (GET_TOKEN_VALUE.form.key_w == KEYW_ELSE)
 	    {
@@ -542,13 +677,15 @@ Node_t* GetElse(LIST* tokens, LangNameTableArray* table_array)
 
 		if (GET_TOKEN_VALUE.form.key_w != KEYW_IF)
 		    {
-			CheckOpenFigBracket(tokens);
+			FIND_SYNTAX_ERROR(CheckOpenFigBracket(tokens));
 
 			else_branch = GetOperatorsSequence(tokens, table_array);
 
-			branch.form.key_w = KEYW_ELSE;
+            FIND_SYNTAX_ERROR(else_branch);
 
-			CheckCloseFigBracket(tokens);
+			FIND_SYNTAX_ERROR(CheckCloseFigBracket(tokens));
+
+            branch.form.key_w = KEYW_ELSE;
 
             List_type fict_token = GetFictToken();
 
@@ -560,6 +697,8 @@ Node_t* GetElse(LIST* tokens, LangNameTableArray* table_array)
 			branch.form.key_w = KEYW_IF;
 
 			else_branch = GetIf(tokens, table_array);
+
+            FIND_SYNTAX_ERROR(else_branch);
 		    }
 
 		return CreateNode(branch, KEYW_TYPE, if_branch, else_branch);
@@ -586,22 +725,44 @@ Node_t* GetParamSequence(LIST* tokens, LangNameTableArray* table_array)
 
 	fict_token.form.key_w = KEYW_COMMA;
 
-	Node_t* first_parametr = GetParam(tokens, table_array);
+    if (GET_TOKEN_VALUE.type == KEYW_TYPE && GET_TOKEN_VALUE.form.key_w == KEYW_CLRND)
+        return CreateNode(fict_token, KEYW_TYPE, nullptr, nullptr);
 
-	Node_t* comma = CreateNode(fict_token, KEYW_TYPE, first_parametr, nullptr);
+	Node_t* fisrt_parametr = GetParam(tokens, table_array);
 
-	while (GET_TOKEN_VALUE.form.key_w == KEYW_COMMA)
-	    {
-        List_type token = GET_TOKEN_VALUE;
+    FIND_SYNTAX_ERROR(fisrt_parametr);
 
-		PopFront(tokens);
+	Node_t* comma = CreateNode(fict_token, KEYW_TYPE, fisrt_parametr, nullptr);
 
-		Node_t* second_parametr = GetParam(tokens, table_array);
+    Node_t* result = comma;
 
-		comma = CreateNode(token, KEYW_TYPE, second_parametr, comma);
-	    }
+    if (GET_TOKEN_VALUE.form.key_w == KEYW_COMMA)
+        {
+        while (GET_TOKEN_VALUE.form.key_w == KEYW_COMMA)
+            {
+            List_type fict_token = GET_TOKEN_VALUE;
 
-	return comma;
+            PopFront(tokens);
+
+            Node_t* second_parametr = GetParam(tokens, table_array);
+
+            FIND_SYNTAX_ERROR(second_parametr);
+
+            comma->right = CreateNode(fict_token, KEYW_TYPE, second_parametr, nullptr);
+
+            comma = comma->right;
+            }
+        }
+    else
+        {
+        if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_CLRND)
+            {
+            PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line, "in function definition missing enumeration operator", ",");
+            return nullptr;
+            }
+        }
+
+	return result;
     }
 
 
@@ -609,20 +770,28 @@ Node_t* GetParam(LIST* tokens, LangNameTableArray* table_array)
     {
 	printf("I AM IN GetParam\n");
 
-	if ((GET_TOKEN_VALUE.type == KEYW_TYPE) && (GET_TOKEN_VALUE.form.key_w == KEYW_INIT))
-	    {
-		List_type fict_token = GET_TOKEN_VALUE;
+    FIND_SYNTAX_ERROR(CheckInitialization(GET_TOKEN_VALUE));
 
-		Node_t* type_var = CreateNode(fict_token, KEYW_TYPE, nullptr, nullptr);
+    if ((GET_TOKEN_VALUE.type == KEYW_TYPE) && (GET_TOKEN_VALUE.form.key_w == KEYW_INIT))
+        {
+        List_type fict_token = GET_TOKEN_VALUE;
 
-		PopFront(tokens);
+        Node_t* type_var = CreateNode(fict_token, KEYW_TYPE, nullptr, nullptr);
 
-		List_type name_var = GET_TOKEN_VALUE;
+        PopFront(tokens);
 
-		return CreateNode(name_var, VAR_DECL_TYPE, type_var, GetVar(tokens, table_array));
-	    }
+        List_type var_name = GET_TOKEN_VALUE;
 
-	else 
+        FIND_SYNTAX_ERROR(CheckIdName(var_name));
+        
+        Node_t* node_var = GetVar(tokens, table_array);
+
+        FIND_SYNTAX_ERROR(GetInitVarInNameTable(table_array, var_name));
+
+        return CreateNode(var_name, VAR_DECL_TYPE, type_var, node_var);
+        }
+
+    else
         return GetVar(tokens, table_array);
     }
 
@@ -653,11 +822,15 @@ Node_t* GetReturn(LIST* tokens, LangNameTableArray* table_array)
     {
 	printf("I AM IN RETURN\n");
 
-    List_type fict_token = GET_TOKEN_VALUE;
+    List_type return_token = GET_TOKEN_VALUE;
 
     PopFront(tokens);
 
-	return CreateNode(fict_token, KEYW_TYPE, nullptr, GetAddSub(tokens, table_array));
+    Node_t* returns_expression = CreateNode(return_token, KEYW_TYPE, nullptr, GetAddSub(tokens, table_array));
+
+    FIND_SYNTAX_ERROR(CheckSequentialOperator(GET_TOKEN_VALUE));
+
+	return returns_expression;
     }
 
 
@@ -667,6 +840,8 @@ Node_t* GetNumber(LIST* tokens, LangNameTableArray* table_array)
 
     if (GET_TOKEN_VALUE.type == NUM_TYPE)
         {
+        printf("I INSITE NUMBER\n");
+
 		List_type number = GET_TOKEN_VALUE;
 
         PopFront(tokens);
@@ -678,89 +853,193 @@ Node_t* GetNumber(LIST* tokens, LangNameTableArray* table_array)
     }
 
 
+Node_t* CheckAssign(LIST* tokens, LangNameTableArray* table_array, 
+                    List_type var_name, List_type var_type, Node_t* rValue, Node_t* type) 
+    {
+    if (GET_TOKEN_VALUE.type == KEYW_TYPE && (GET_TOKEN_VALUE.form.key_w == KEYW_ASSIGN))
+        {
+        List_type assign_token = GET_TOKEN_VALUE;
+
+		PopFront(tokens);
+
+		Node_t* lValue = GetAddSub(tokens, table_array);
+
+		Node_t* assign_node = CreateNode(assign_token, KEYW_TYPE, lValue, rValue);
+
+        Node_t* var_node = CreateNode(var_name, VAR_DECL_TYPE, type, assign_node);
+
+        FIND_SYNTAX_ERROR(CheckSequentialOperator(GET_TOKEN_VALUE));
+
+        return var_node;
+        }
+
+    return nullptr;
+    }
+
+
 /*------------------------------------------------CHECK_VALID---------------------------------------------------------*/
 
 
-void CheckValidFunc(LIST* tokens)
+Node_t* CheckInitialization(List_type token)
     {
-	printf("I CHECK VALID FUNC\n");
+	printf("I CHECK INIT\n");
 
-	if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_INIT)
-		fprintf(stderr, "Functions not found\n");
+	if (token.type != KEYW_TYPE || token.form.key_w != KEYW_INIT)
+        {
+        switch(token.type)
+            {
+            case ID_TYPE:
+                {
+                PRINT_SYNTAX_ERROR(token.line, "use of undeclared identifier", token.form.id);
+                return nullptr;
+                break;
+                }
+
+            case KEYW_TYPE:
+                {
+                PRINT_SYNTAX_ERROR(token.line, "incorrect use of operator", GetKeywordByNumber(token.form.key_w));
+                return nullptr;
+                break;
+                }
+
+            default: return nullptr;
+            }
+        }
+
+    return NO_ERROR_PTR;
     }
 
 
-void CheckOpenRoundBracket(LIST* tokens)
+Node_t* CheckOpenRoundBracket(LIST* tokens)
     {
 	printf("I CHECK (\n");
 
-	if (GET_TOKEN_VALUE.form.key_w != KEYW_OPRND)
-		fprintf(stderr, "Missing opening bracket '('\n");
+	if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_OPRND)
+        {
+		PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line,  "missing opening bracket", "(");
+        return nullptr;
+        }
 
 	else 
         PopFront(tokens);
+
+    return NO_ERROR_PTR;
     }
 
 
-void CheckIdName(LIST* tokens)
+Node_t* CheckIdName(List_type token)
     {
-	printf("I CHECK WORD OR NO\n");
+	printf("I CHECK ID NAME\n");
 
-	if (GET_TOKEN_VALUE.type != ID_TYPE)
-		fprintf(stderr, "It's must be word\n");
+	if (token.type != ID_TYPE)
+        {
+		PRINT_SYNTAX_ERROR(token.line, "using a keyword as a variable", GetKeywordByNumber(token.form.key_w));
+        return nullptr;
+        }
+
+    return NO_ERROR_PTR;
     }
 
 
-void CheckCloseRoundBracket(LIST* tokens)
+Node_t* CheckCloseRoundBracket(LIST* tokens)
     {
 	printf("I CHECK )\n");
 
-	if (GET_TOKEN_VALUE.form.key_w != KEYW_CLRND)
-		fprintf(stderr, "Missing closing bracket ')'\n");
+	if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_CLRND)
+        {
+		PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line, "missing closing bracket", ")");
+        return nullptr;
+        }
 
 	else 
         PopFront(tokens);
+
+    return NO_ERROR_PTR;
     }
 
 
-void CheckOpenFigBracket(LIST* tokens)
+Node_t* CheckOpenFigBracket(LIST* tokens)
     {
 	printf("I CHECK {\n");
 
-	if (GET_TOKEN_VALUE.form.key_w != KEYW_OPFIG)
-		fprintf(stderr, "Missing opening bracket '('\n");
+	if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_OPFIG)
+		{
+        PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line - 1, "missing opening bracket", "type");
+        return nullptr;
+        }
 
 	else 
         PopFront(tokens);
+
+    return NO_ERROR_PTR;
     }
 
 
-void CheckCloseFigBracket(LIST* tokens)
+Node_t* CheckCloseFigBracket(LIST* tokens)
     {
 	printf("I CHECK }\n");
 	
-	if (GET_TOKEN_VALUE.form.key_w != KEYW_CLFIG)
-		fprintf(stderr, "Missing closing bracket 'sent'\n");
+	if (GET_TOKEN_VALUE.type != KEYW_TYPE || GET_TOKEN_VALUE.form.key_w != KEYW_CLFIG)
+		{
+        PRINT_SYNTAX_ERROR(GET_TOKEN_VALUE.line, "missing closing bracket", "sent");
+        return nullptr;
+        }
 
 	else 
         PopFront(tokens);
+
+    return NO_ERROR_PTR;
     }
 
 
-#undef GET_TOKEN_VALUE
-#undef ADD_TO_GLOBAL_TABLE
+Node_t* CheckSequentialOperator(List_type oper)
+    {
+    printf("I CHECK SEQ_OPERATOR\n");
+
+    if (oper.type != KEYW_TYPE || oper.form.key_w != KEYW_END)
+        {
+        PRINT_SYNTAX_ERROR(oper.line - 1, "missing operator", ";");
+        return nullptr;
+        } 
+
+    return NO_ERROR_PTR;
+    }
+
+
+bool CheckOperators(List_type oper) 
+    {
+    if (oper.type == KEYW_TYPE && (oper.form.key_w == KEYW_WHILE  || oper.form.key_w == KEYW_IF       || 
+                                   oper.form.key_w == KEYW_RETURN || oper.form.key_w == KEYW_INIT     || 
+                                   oper.form.key_w == KEYW_PRINTF ||
+                                   oper.form.key_w == KEYW_BREAK  || oper.form.key_w == KEYW_CONTINUE))
+        {
+        return true;
+        }
+
+    else if (oper.form.key_w == KEYW_ELSE)
+        {
+        fprintf(stderr, "line: %zu\n", oper.line);
+        fprintf(stderr, "error: using else without if\n");
+        }
+
+    else if (oper.form.key_w == KEYW_INPUT)
+        {
+        PRINT_SYNTAX_ERROR(oper.line, "incorrect using of operator", "input");
+        }
+
+    else if (oper.form.key_w == KEYW_CLFIG)
+        return false;
+
+    else
+        {
+        PRINT_SYNTAX_ERROR(oper.line, "improper use of the operator", GetKeywordByNumber(oper.form.key_w));
+        }
+    
+    return false;
+    }
 
 
 /*------------------------------------------------Help_Functions----------------------------------------------------*/
-
-
-void CheckTableArraySize(LangNameTableArray* table_array) 
-    {
-    table_array->ptr++;
-
-    if (table_array->ptr >= table_array->capacity)
-        NameTableArrayRealloc(table_array);
-    }
 
 
 List_type GetFictToken() 
@@ -773,3 +1052,44 @@ List_type GetFictToken()
 
     return fict_node;
     }
+
+
+void BeginningOfInitVar(LangNameTable* table)
+    {
+    for (size_t i = 0; i < table->ptr; i++)
+        {
+        if (table->Table[i].init > 1)
+            table->Table[i].init = 1;
+        }
+    }
+
+
+Node_t* GetInitVarInNameTable(LangNameTableArray* table_array, List_type token)
+    {
+    size_t pos_global = FindInNameTable(&table_array->Array[GLOBAL_TABLE_INDEX], token.form.id);
+
+    if (pos_global != -1)
+        {
+        PRINT_SYNTAX_ERROR(token.line, "initializing a global variable", token.form.id);
+        return nullptr;
+        }
+
+    LangNameTable* table = &table_array->Array[table_array->ptr];
+
+    size_t pos = FindInNameTable(table, token.form.id);
+
+    table->Table[pos].init = 1;
+
+    return NO_ERROR_PTR;
+    }
+
+
+/*------------------------------------------------------------------------------------------------------------------*/
+
+
+#undef GET_TOKEN_VALUE
+#undef ADD_TO_GLOBAL_TABLE
+#undef PRINT_SYNTAX_ERROR
+#undef FIND_SYNTAX_ERROR
+#undef CREATE_OPERATION_NODE
+#undef PRINT_OR_IDENT

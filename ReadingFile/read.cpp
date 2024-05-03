@@ -75,3 +75,17 @@ int SkipSpaces(Text* data, size_t i)
     
     return i;
     }
+
+
+size_t SkipEndOfString(Text* data, size_t i) 
+    {
+    while (data->Buf[i] == '\0')
+        {
+        if (i == data->BufSize)
+            break;
+            
+        i++;
+        }
+
+    return i;
+    }

@@ -1,4 +1,67 @@
-int main(int a, int b)
+int x_1 = 0;
+int x_2 = 0;
+
+int main()
 type
-    print(a);
+    int a = input();
+    int b = input();
+    int c = input();
+
+    int n_roots = SolveQuadratic(a, b, c);
+
+    print(n_roots);
+
+    return 0;
 sent
+
+int SolveQuadratic(int a, int b, int c)
+type
+    if (a == 0)
+    type
+        int n_roots = SolveLinear(b, c);
+
+        return n_roots;
+    sent
+
+    int discr = b*b - 4*a*c;
+
+    x_1 = 0;
+
+    if (discr < 0)
+    type
+        return 0;
+    sent
+
+    if (discr == 0)
+    type
+        return 1;
+    sent
+
+    return 2;
+sent
+
+int SolveLinear(int a, int b)
+type
+    if (a == 0)
+    type
+        if (b == 0)
+        type
+            return 8;
+        sent
+
+        if (b != 0)
+        type
+            return 0;
+        sent
+    sent
+
+    if (a != 0)
+    type
+        return 1;
+    sent
+
+    x_2 = 4;
+
+    return 0;
+sent
+

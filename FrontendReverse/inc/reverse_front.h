@@ -6,13 +6,11 @@
 
 enum ReverseErrors 
     {
-    NOT_FIND_REVERSE_ERRORS = 0 << 1,
+    NOT_FIND_REVERSE_ERRORS = 0,
     UNKNOWN_NODE_TYPE       = 1 << 1,
     UNKNOWN_KEYWORD         = 1 << 2
     };
 
-
-const char* GetKeyword(Node_t* node);
 
 ReverseErrors GetMySyntax(Node_t* node, FILE* file);
 
