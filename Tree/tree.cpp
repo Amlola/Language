@@ -430,8 +430,6 @@ const char* GetKeyword(Node_t* node)
     {
     assert(node);
 
-    printf("%d\n", node->kind.form.key_w);
-
     for (size_t i = 0; i < NUMBER_OF_KEYWORD; i++) 
         {
         if (node->kind.form.key_w == keyword_array[i].num)

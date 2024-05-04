@@ -83,7 +83,7 @@ Node_t* CheckCloseFigBracket(LIST* tokens);
 
 Node_t* CheckSequentialOperator(List_type oper);
 
-List_type GetFictToken();
+List_type GetFictToken(OperatorCode oper);
 
 void CheckTableArraySize(LangNameTableArray* table_array);
 
@@ -91,7 +91,9 @@ bool CheckOperators(List_type oper);
 
 void FrontDtor(Tree* tree, LIST* list, LangNameTableArray* table_array);
 
-void BeginningOfInitVar(LangNameTable* table);
+void BeginningOfInitVar(LangNameTable* table, int init_array[]);
+
+void GetInitArray(int* init_array, LangNameTableArray* table_array);
 
 Node_t* GetInitVarInNameTable(LangNameTableArray* table_array, List_type token);
 

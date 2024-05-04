@@ -16,16 +16,14 @@ sent
 
 int SolveQuadratic(int a, int b, int c)
 type
-    if (a == 0)
+    if (a == 0 || b < 3 || c > 1)
     type
         int n_roots = SolveLinear(b, c);
 
         return n_roots;
     sent
 
-    int discr = b*b - 4*a*c;
-
-    x_1 = 0;
+    int discr = b * b - 4 * a * c;
 
     if (discr < 0)
     type
@@ -60,8 +58,8 @@ type
         return 1;
     sent
 
-    x_2 = 4;
-
     return 0;
 sent
+
+
 

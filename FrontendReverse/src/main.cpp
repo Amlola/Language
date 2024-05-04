@@ -33,35 +33,52 @@ int main(int argc, char* argv[])
 
     GetNameTableArray(&table_array, &data_name_table);
 
+    printf("\n\n");
+
 /*--------------------------------------------------------------*/
 
-    /*Tree tree = {};
+    Tree tree = {};
 
     TreeCtor(&tree);
 
     TreeRead(&tree, &analyz, &table_array);
 
+    TreeDump(&tree, tree.root);
+
     FILE* lang_file = fopen("../lang_file.txt", "w");
 
     CHECK_FILE(lang_file, "../lang_file.txt");
 
-    GetMySyntax(tree.root, lang_file);
+    ReverseErrors errors = GetMySyntax(tree.root, lang_file);
 
-    fclose(lang_file);
-
-    TreeDump(&tree, tree.root);*/
+    if (errors != NOT_FIND_REVERSE_ERRORS)
+        {
+        printf("ALL IS BAD\n");
+        fclose(lang_file);
+        ReverseDtor(&table_array, &tree, &analyz, &data_name_table);
+        return errors;
+        }
 
 /*---------------------------------------------------------------*/
 
-    free(analyz.Buf);
+    ReverseDtor(&table_array, &tree, &analyz, &data_name_table);
 
-    free(data_name_table.Buf);
-
-    NameTableArrayDtor(&table_array);
-
-    //TreeDtor(&tree);
+    fclose(lang_file);
 
     printf("ALL IS GOOD\n");
 
     return 0;
+    }
+
+
+void ReverseDtor(LangNameTableArray* table_array, Tree* tree, 
+                 Text* analyz, Text* data_name_table)
+    {
+    free(analyz->Buf);
+
+    free(data_name_table->Buf);
+
+    NameTableArrayDtor(table_array);
+
+    TreeDtor(tree);
     }

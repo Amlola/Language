@@ -209,7 +209,7 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
             number_local_table++;
         }   
 
-    fprintf(name_table_file, "%zu\n\n", number_local_table);
+    fprintf(name_table_file, "%zu\n\n", table_array->ptr - 2);
 
     fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].ptr, 
                                          table_array->Array[GLOBAL_TABLE_INDEX].table_number);
@@ -307,7 +307,7 @@ NameTableError GetGlobalAndLocalsTable(LangNameTableArray* table_array, Text* da
 
     table_array->ptr++;
 
-    for (size_t table_number = 2; table_number < (locals_table_size + 2); table_number++) 
+    for (size_t table_number = 2; table_number < (locals_table_size + 1); table_number++) 
         {        
         NameTableCtor(&table_array->Array[table_number]);
         CheckTableArraySize(table_array);

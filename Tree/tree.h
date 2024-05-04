@@ -4,7 +4,7 @@
 #include "../Front/inc/Lexem.h"
 
 
-const int NUMBER_OF_KEYWORD = 31; //need to add if keyword++
+const int NUMBER_OF_KEYWORD = 32; //need to add if keyword++
 
 
 #define CHECK_TREE_ERROR(tree)                           \
@@ -135,7 +135,8 @@ const Keyword keyword_array[] =
     {72, "break"},
     {73, "continue"},
     {74, "abort"},
-    {5,  "else"}
+    {5,  "else"},
+    {6,  "^"}
     };
 
 

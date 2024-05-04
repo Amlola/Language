@@ -43,13 +43,21 @@ Node_t* GetGrammar(LIST* tokens, LangNameTableArray* table_array)
 
     FIND_SYNTAX_ERROR(func);
 
-    List_type fict_token = GetFictToken();
+    List_type fict_token = GetFictToken(KEYW_END);
 
     if (GET_TOKEN_VALUE.form.key_w == KEYW_ENDOF)
-        return CreateNode(fict_token, KEYW_TYPE, func, nullptr);
+        {
+        Node_t* res = CreateNode(fict_token, KEYW_TYPE, func, nullptr);
+        FIND_SYNTAX_ERROR(res);
+        return res;
+        }
     
     else 
-        func = CreateNode(fict_token, KEYW_TYPE, func, GetGrammar(tokens, table_array));
+        {
+        Node_t* grammar = GetGrammar(tokens, table_array);
+        FIND_SYNTAX_ERROR(grammar);
+        func = CreateNode(fict_token, KEYW_TYPE, func, grammar);
+        }
 
 	return func;
     }
@@ -177,7 +185,7 @@ Node_t* GetOperator(LIST* tokens, LangNameTableArray* table_array)
 
     Node_t* oper_node = nullptr;
 
-	List_type fict_token = GetFictToken();
+	List_type fict_token = GetFictToken(KEYW_END);
 
     if (oper.type == NUM_TYPE)
         {
@@ -225,17 +233,12 @@ Node_t* GetOperator(LIST* tokens, LangNameTableArray* table_array)
                 }
 
             case KEYW_BREAK:
-                {
-                oper_node = GetCyclesOperators(tokens, oper);
-                break;
-                }
-                        
             case KEYW_CONTINUE:
                 {
                 oper_node = GetCyclesOperators(tokens, oper);
                 break;
                 }
-            
+                        
             default:
                 {
                 return nullptr;
@@ -386,18 +389,27 @@ Node_t* GetArgumentSequence(LIST* tokens, LangNameTableArray* table_array)
 
 	Node_t* first_arg = GetAddSub(tokens, table_array);
 
+    if (GET_TOKEN_VALUE.form.key_w != KEYW_COMMA)
+        return first_arg;
+
+    List_type fict_token = GetFictToken(KEYW_COMMA);
+
+    Node_t* comma = CreateNode(fict_token, KEYW_TYPE, first_arg, nullptr);
+
+    Node_t* result = comma;
+
 	while (GET_TOKEN_VALUE.form.key_w == KEYW_COMMA)
 		{
-		List_type fict_token = GET_TOKEN_VALUE;
-
 		PopFront(tokens);
 
-		Node_t* second_arg = CreateNode(fict_token, KEYW_TYPE, nullptr, GetAddSub(tokens, table_array));
+        Node_t* second_arg = GetAddSub(tokens, table_array);
 
-		first_arg = CreateNode(fict_token, KEYW_TYPE, second_arg, first_arg);
+        comma->right = CreateNode(fict_token, KEYW_TYPE, second_arg, nullptr);
+
+        comma = comma->right;
 		}
 
-	return first_arg;
+	return result;
 	}
 
 
@@ -593,6 +605,9 @@ Node_t* GetWhile(LIST* tokens, LangNameTableArray* table_array)
 
 	PopFront(tokens);
 
+    int init_array[NAME_TABLE_CAPACITY] = {};
+    GetInitArray(init_array, table_array);
+
 	FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));
 
 	Node_t* state_while = GetOr(tokens, table_array);
@@ -613,13 +628,13 @@ Node_t* GetWhile(LIST* tokens, LangNameTableArray* table_array)
 
 	while_branch.form.key_w = KEYW_WHILE;
 
-    List_type fict_token = GetFictToken();
+    List_type fict_token = GetFictToken(KEYW_END);
 
     PushFront(tokens, fict_token);
 
     LangNameTable* table = &table_array->Array[table_array->ptr];
 
-    BeginningOfInitVar(table);
+    BeginningOfInitVar(table, init_array);
 
 	return CreateNode(while_branch, KEYW_TYPE, state_while, body_while);
     }
@@ -630,6 +645,9 @@ Node_t* GetIf(LIST* tokens, LangNameTableArray* table_array)
 	printf("I AM IN IF\n");
 
 	PopFront(tokens);
+
+    int init_array[NAME_TABLE_CAPACITY] = {};
+    GetInitArray(init_array, table_array);
 
 	FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));
 
@@ -649,7 +667,7 @@ Node_t* GetIf(LIST* tokens, LangNameTableArray* table_array)
 
     LangNameTable* table = &table_array->Array[table_array->ptr];
 
-    BeginningOfInitVar(table);
+    BeginningOfInitVar(table, init_array);
 
 	return CreateNode(if_type, KEYW_TYPE, state_if, body_if);
     }
@@ -687,7 +705,7 @@ Node_t* GetElse(LIST* tokens, LangNameTableArray* table_array)
 
             branch.form.key_w = KEYW_ELSE;
 
-            List_type fict_token = GetFictToken();
+            List_type fict_token = GetFictToken(KEYW_END);
 
             PushFront(tokens, fict_token);
 		    }
@@ -706,7 +724,7 @@ Node_t* GetElse(LIST* tokens, LangNameTableArray* table_array)
 
     else 
         {
-        List_type fict_token = GetFictToken();
+        List_type fict_token = GetFictToken(KEYW_END);
 
         PushFront(tokens, fict_token);
         }
@@ -719,11 +737,7 @@ Node_t* GetParamSequence(LIST* tokens, LangNameTableArray* table_array)
     {
 	printf("I AM IN PARAM SEQ\n");
 
-	List_type fict_token = {};
-
-	fict_token.type = KEYW_TYPE;
-
-	fict_token.form.key_w = KEYW_COMMA;
+	List_type fict_token = GetFictToken(KEYW_COMMA);
 
     if (GET_TOKEN_VALUE.type == KEYW_TYPE && GET_TOKEN_VALUE.form.key_w == KEYW_CLRND)
         return CreateNode(fict_token, KEYW_TYPE, nullptr, nullptr);
@@ -1042,25 +1056,27 @@ bool CheckOperators(List_type oper)
 /*------------------------------------------------Help_Functions----------------------------------------------------*/
 
 
-List_type GetFictToken() 
+List_type GetFictToken(OperatorCode oper) 
     {
     List_type fict_node = {};
-
     fict_node.type = KEYW_TYPE;
-
-	fict_node.form.key_w = KEYW_END;
+	fict_node.form.key_w = oper;
 
     return fict_node;
     }
 
 
-void BeginningOfInitVar(LangNameTable* table)
+void BeginningOfInitVar(LangNameTable* table, int init_array[])
     {
-    for (size_t i = 0; i < table->ptr; i++)
-        {
-        if (table->Table[i].init > 1)
-            table->Table[i].init = 1;
-        }
+    for (size_t i = 0; i < NAME_TABLE_CAPACITY; i++)
+        table->Table[i].init = init_array[i];
+    }
+
+
+void GetInitArray(int* init_array, LangNameTableArray* table_array)
+    {
+    for (size_t i = 0; i < NAME_TABLE_CAPACITY; i++)
+        init_array[i] = table_array->Array[table_array->ptr].Table[i].init;
     }
 
 
@@ -1078,7 +1094,7 @@ Node_t* GetInitVarInNameTable(LangNameTableArray* table_array, List_type token)
 
     size_t pos = FindInNameTable(table, token.form.id);
 
-    table->Table[pos].init = 1;
+    table->Table[pos].init += 1;
 
     return NO_ERROR_PTR;
     }
