@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 
     if (argc < 2) 
         {
-        fprintf(stderr, "you must specify the input and output file\n");
+        printf("you must specify the input and output file\n");
         return NOT_ALL_ARGUMENTS_ARE_SPECIFIED;
         }
 

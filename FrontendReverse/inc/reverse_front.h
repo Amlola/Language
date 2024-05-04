@@ -32,7 +32,4 @@ ReverseErrors PrintBodyFunc(Node_t* node, FILE* file, size_t* indent, bool* flag
 
 ReverseErrors PrintKeyword(Node_t* node, FILE* file, size_t* indent, bool* flag);
 
-void ReverseDtor(LangNameTableArray* table_array, Tree* tree, 
-                 Text* analyz, Text* data_name_table);
-
 void PrintIndent(size_t* indent, FILE* file);

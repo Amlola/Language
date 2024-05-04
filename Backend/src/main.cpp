@@ -1,21 +1,22 @@
-#include "../inc/reverse_front.h"
+#include "../inc/ir.h"
+
 
 
 int main(int argc, char* argv[]) 
-    {
+    {    
      if (argc < 2) 
         {
         printf("you must specify the input, name_table\n");
         return NOT_ALL_ARGUMENTS_ARE_SPECIFIED;
         }
 
-    Text analyz = {};
+    Text tree_analyz = {};
 
     FILE* file_input = fopen(argv[1], "r");
 
     CHECK_FILE(file_input, argv[1]);
 
-    FileInput(file_input, &analyz);
+    FileInput(file_input, &tree_analyz);
 
 /*--------------------------------------------------------------*/
 
@@ -41,29 +42,21 @@ int main(int argc, char* argv[])
 
     TreeCtor(&tree);
 
-    TreeRead(&tree, &analyz, &table_array);
+    TreeRead(&tree, &tree_analyz, &table_array);
 
     TreeDump(&tree, tree.root);
 
-    FILE* lang_file = fopen("../lang_file.txt", "w");
+/*--------------------------------------------------------------*/
 
-    CHECK_FILE(lang_file, "../lang_file.txt");
+    LIST instruction_list = {};
 
-    ReverseErrors errors = GetMySyntax(tree.root, lang_file);
+    ListCtor(&instruction_list);
 
-    if (errors != NOT_FIND_REVERSE_ERRORS)
-        {
-        printf("ALL IS BAD\n");
-        fclose(lang_file);
-        ReverseBackDtor(&table_array, &tree, &analyz, &data_name_table);
-        return errors;
-        }
+    //GetIr(&instruction list, tree.root, &table_array);
 
-/*---------------------------------------------------------------*/
+    ReverseBackDtor(&table_array, &tree, &tree_analyz, &data_name_table);
 
-    fclose(lang_file);
-
-    ReverseBackDtor(&table_array, &tree, &analyz, &data_name_table);
+    ListDtor(&instruction_list);
 
     printf("ALL IS GOOD\n");
 

@@ -88,22 +88,22 @@ ReverseErrors PrintParameters(Node_t* node, FILE* file, size_t* indent, bool* fl
 
     ReverseErrors errors = NOT_FIND_REVERSE_ERRORS;
 
-    if (comma->right)
-        {
-        while (comma)
-            {
-            errors = PrintVarDecl(comma->left, file, indent, flag);
-            CHECK_VALID;
+    while (comma)
+        {     
+        if (!comma->left)
+            break;
+                 
+        errors = PrintVarDecl(comma->left, file, indent, flag);
+        CHECK_VALID;
 
-            comma = comma->right;
+        comma = comma->right;
 
-            if (!comma)
-                break;
+        if (!comma)
+            break;
 
-            PRINT_SPECIAL_SYMBOL(",");
+        PRINT_SPECIAL_SYMBOL(",");
 
-            PRINT_SPACE;
-            }
+        PRINT_SPACE;
         }
 
     PRINT_SPECIAL_SYMBOL(")");
@@ -159,7 +159,7 @@ ReverseErrors PrintTypeNode(Node_t* node, FILE* file, size_t* indent, bool* flag
     assert(file);
 
     if (!node)
-        return UNEXPECTED_TYPE;
+        return NOT_FIND_REVERSE_ERRORS;
 
     ReverseErrors errors = NOT_FIND_REVERSE_ERRORS;
 
@@ -239,19 +239,28 @@ ReverseErrors PrintArgumentSequence(Node_t* node, FILE* file, size_t* indent, bo
 
     if (comma)
         {
-        while (comma->kind.form.key_w == KEYW_COMMA)
+        if (comma->kind.form.key_w == KEYW_COMMA)
             {
-            errors = PrintTypeNode(comma->left, file, indent, flag);
+            while (comma->kind.form.key_w == KEYW_COMMA)
+                {
+                errors = PrintTypeNode(comma->left, file, indent, flag);
+                CHECK_VALID;
+
+                comma = comma->right;
+
+                if (!comma)
+                    break;
+
+                PRINT_SPECIAL_SYMBOL(",");
+
+                PRINT_SPACE;
+                }
+            }
+            
+        else 
+            {
+            errors = PrintTypeNode(comma, file, indent, flag);
             CHECK_VALID;
-
-            comma = comma->right;
-
-            if (!comma)
-                break;
-
-            PRINT_SPECIAL_SYMBOL(",");
-
-            PRINT_SPACE;
             }
         }
 
@@ -272,7 +281,6 @@ ReverseErrors PrintBodyFunc(Node_t* node, FILE* file, size_t* indent, bool* flag
         PrintIndent(indent, file);
 
         errors = PrintTypeNode(sequential_operator->left, file, indent, flag);
-
         CHECK_VALID;
 
         sequential_operator = sequential_operator->right;
@@ -283,9 +291,6 @@ ReverseErrors PrintBodyFunc(Node_t* node, FILE* file, size_t* indent, bool* flag
         PRINT_NEW_LINE;
 
         *flag = true;
-
-        if (!sequential_operator)
-            break;
         }
 
     return NOT_FIND_REVERSE_ERRORS;
@@ -428,6 +433,23 @@ ReverseErrors PrintKeyword(Node_t* node, FILE* file, size_t* indent, bool* flag)
         case KEYW_CONTINUE:
             {
             PRINT_MY_LANG(GetKeyword(node));
+            break;
+            }
+
+        case KEYW_END:
+            {
+            errors = PrintTypeNode(node->left, file, indent, flag);
+            CHECK_VALID;
+
+            PRINT_SPECIAL_SYMBOL(";");
+
+            *flag = false;
+
+            PRINT_NEW_LINE;
+            PrintIndent(indent, file);
+
+            errors = PrintTypeNode(node->right, file, indent, flag);
+            CHECK_VALID;
             break;
             }
 

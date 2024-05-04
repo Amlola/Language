@@ -58,6 +58,7 @@ struct Tree
     Node_t* root;
     size_t size;
     Type_error status;
+    size_t main_func;
     };
 
 
@@ -146,6 +147,8 @@ Type_error TreeDelete(Tree* tree, Node_t* node);
 
 Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array);
 
+Type_error TreePrefixPrintNode(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array);
+
 bool TreeVerify(Tree* tree);
 
 Type_error TreeDtor(Tree* tree); 
@@ -166,8 +169,11 @@ Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array);
 
 Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
 
-Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
+Node_t* MakeNodeFromText(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
 
 const char* GetKeyword(Node_t* node);
 
 const char* GetKeywordByNumber(int number_keyword);
+
+void ReverseBackDtor(LangNameTableArray* table_array, Tree* tree, 
+                 Text* analyz, Text* data_name_table);

@@ -75,6 +75,20 @@ Type_error TreeDelete(Tree* tree, Node_t* node)
 
 Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array)
     {
+    char main_name[] = "main";
+
+    size_t main_func = FindInNameTable(&table_array->Array[GENERAL_TABLE_INDEX], main_name);
+
+    fprintf(file, "%zu ", main_func);
+
+    TreePrefixPrintNode(tree, node, file, table_array);
+
+    return tree->status;
+    }
+
+
+Type_error TreePrefixPrintNode(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array)
+    {
     if (node == nullptr) 
         fprintf(file, "_ ");
     
@@ -94,7 +108,7 @@ Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file, LangNameTableAr
 
     if (node->left) 
         {
-        TreePrefixPrint(tree, node->left, file, table_array);
+        TreePrefixPrintNode(tree, node->left, file, table_array);
         }
     
     else
@@ -102,7 +116,7 @@ Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file, LangNameTableAr
 
     if (node->right)
         {
-        TreePrefixPrint(tree, node->right, file, table_array);
+        TreePrefixPrintNode(tree, node->right, file, table_array);
         }
 
     else 
@@ -318,7 +332,9 @@ void TreeDumpFunction(Tree* tree, Node_t* node, const char* path, const char* si
 
 Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array) 
     {
-    size_t i = 0;
+    tree->main_func = atoi(data->Buf);
+
+    size_t i = 2;
 
     tree->root = PrefixReadTree(tree, data, &i, table_array);
     
@@ -380,12 +396,13 @@ Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* ta
             }
         } 
 
-        node->left  = CreateNodeFromBrackets(tree, data, i, table_array);
+        node->left  = MakeNodeFromText(tree, data, i, table_array);
 
-        node->right = CreateNodeFromBrackets(tree, data, i, table_array);
+        node->right = MakeNodeFromText(tree, data, i, table_array);
 
         if (data->Buf[*i] != ')')
             {
+            printf("PIZDEZ\n");
             TreeDtor(tree);
 
             return nullptr;
@@ -395,7 +412,7 @@ Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* ta
     }
 
 
-Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)
+Node_t* MakeNodeFromText(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array)
     {
     Node_t* node = nullptr;
 
@@ -448,4 +465,17 @@ const char* GetKeywordByNumber(int number_keyword)
         }
 
     return nullptr;
+    }
+
+
+void ReverseBackDtor(LangNameTableArray* table_array, Tree* tree, 
+                 Text* analyz, Text* data_name_table)
+    {
+    free(analyz->Buf);
+
+    free(data_name_table->Buf);
+
+    NameTableArrayDtor(table_array);
+
+    TreeDtor(tree);
     }

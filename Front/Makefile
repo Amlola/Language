@@ -1,5 +1,4 @@
 SANIT_FLAGS = #-fsanitize=address,undefined
-OPT_FLAG = -O2
 DEBUG = -D DUMP
 
 all: MYFRONT
@@ -29,4 +28,4 @@ read.o:	../ReadingFile/read.cpp
 	@g++ -g $(SANIT_FLAGS) -c ../ReadingFile/read.cpp -o ../ReadingFile/read.o
 
 clean:
-	rm obj/* front.exe ../List/*.o ../Tree/*.o ../NameTable/*.o
+	rm obj/* front.exe ../List/*.o ../Tree/*.o ../NameTable/*.o ../ReadingFile/*.o 
