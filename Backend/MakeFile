@@ -5,22 +5,22 @@ DEBUG = -D DUMP
 all: MYBACK
 
 MYBACK: main.o tree.o name_table.o read.o list.o
-	@g++ -g $(DEBUG) $(SANIT_FLAGS) -o back.exe obj/main.o ../Tree/tree.o ../NameTable/name_table.o ../ReadingFile/read.o ../List/list.o
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -o back.exe obj/main.o inc/Tree_backend/tree.o inc/NameTable_backend/name_table.o inc/ReadingFile_backend/read.o inc/List_backend/list.o
 
 main.o: src/main.cpp
 	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c src/main.cpp -o obj/main.o
 
-tree.o: ../Tree/tree.cpp
-	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c ../Tree/tree.cpp -o ../Tree/tree.o
+tree.o: inc/Tree_backend/tree.cpp
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c inc/Tree_backend/tree.cpp -o inc/Tree_backend/tree.o
 
-name_table.o: ../NameTable/name_table.cpp
-	@g++ -g $(SANIT_FLAGS) -c ../NameTable/name_table.cpp -o ../NameTable/name_table.o
+name_table.o: inc/NameTable_backend/name_table.cpp
+	@g++ -g $(SANIT_FLAGS) -c inc/NameTable_backend/name_table.cpp -o inc/NameTable_backend/name_table.o
 
-read.o:	../ReadingFile/read.cpp
-	@g++ -g $(SANIT_FLAGS) -c ../ReadingFile/read.cpp -o ../ReadingFile/read.o
+read.o:	inc/ReadingFile_backend/read.cpp
+	@g++ -g $(SANIT_FLAGS) -c inc/ReadingFile_backend/read.cpp -o inc/ReadingFile_backend/read.o
 
-list.o: ../List/list.cpp
-	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c ../List/list.cpp -o ../List/list.o
+list.o: inc/List_backend/list.cpp
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c inc/List_backend/list.cpp -o inc/List_backend/list.o
 
 clean:
-	rm obj/* back.exe ../Tree/*.o ../NameTable/*.o ../ReadingFile/*.o ../List/*.o
+	rm obj/* back.exe inc/Tree_backend/*.o inc/NameTable_backend/*.o inc/ReadingFile_backend/*.o inc/List_backend/*.o

@@ -3,6 +3,6 @@ make
 ./front.exe ../input.txt ../output.txt
 cd ..
 
-cd FrontendReverse
+cd Backend
 make
-./reverse.exe ../output.txt ../name_table.txt
+./back.exe ../output.txt ../name_table.txt

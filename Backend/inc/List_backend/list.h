@@ -1,13 +1,14 @@
 #pragma once
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include <math.h>
-#include "../Front/inc/Token_struct.h"
+#include "../Ir_struct.h"
+#include "../../../Front/inc/Token_struct.h"
+
+
+#define ListGraphDump(list_ptr) ListGraphDumpFunction(list_ptr, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+static FILE* graph_file_list = NULL;
+
+#define PRINT_TO_GRAPH_FILE(...) fprintf(graph_file_list, __VA_ARGS__);
 
 
 #define INDEX_LIST
@@ -31,7 +32,7 @@ const int ZERO            =  0;
 const int FREE_INDEX      = -1;
 
 
-typedef Token List_type;
+typedef Ir List_type;
 
 
 struct Node
@@ -94,6 +95,7 @@ const LIST_STATUS ErrorArray[] =
     };
 
 
+
 int ListCtor(LIST* list);
 
 static void SetList(LIST* list, size_t size);
@@ -127,3 +129,5 @@ iterator_t Begin(LIST* list);
 iterator_t End(LIST* list);
 
 void UpdateParams(LIST* list); 
+
+void ListGraphDumpFunction(LIST* list, const char* path, const char* signature, unsigned line);

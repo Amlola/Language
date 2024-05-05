@@ -46,6 +46,8 @@ int main(int argc, char* argv[])
 
     TreeDump(&tree, tree.root);
 
+    printf("%zu\n", tree.main_func);
+
 /*--------------------------------------------------------------*/
 
     LIST instruction_list = {};

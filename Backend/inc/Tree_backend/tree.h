@@ -1,13 +1,10 @@
 #pragma once
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include <math.h>
+#include "../NameTable_backend/name_table.h"
 
+
+const int NUMBER_OF_KEYWORD = 32; //need to add if keyword++
 
 
 #define CHECK_TREE_ERROR(tree)                           \
@@ -32,9 +29,7 @@
 
 typedef char* Tree_type;
 
-
 typedef int Type_error;
-
 
 enum Tree_status
     {
@@ -48,25 +43,6 @@ enum Tree_status
     NUM_OF_ERROR                  = 6
     };
 
-
-
-const int MAX_COMMAND_LENGTH = 125;
-
-const size_t WORD_MAX_LEN = 100;
-
-
-
-struct Token
-    {
-    int type;
-
-    union NodeType
-        {
-        int key_w;
-        double num;
-        char id[WORD_MAX_LEN];
-        }form;
-    };
 
 struct Node_t 
     {
@@ -82,13 +58,7 @@ struct Tree
     Node_t* root;
     size_t size;
     Type_error status;
-    };
-
-
-struct Text
-    {
-    char* Buf;
-    long long BufSize;
+    size_t main_func;
     };
 
 
@@ -96,18 +66,6 @@ enum Child
     {
     L_CHILD = 0,
     R_CHILD = 1,
-    };
-
-
-enum Types
-    {
-    NUM_TYPE       = 1,
-    ID_TYPE        = 2,
-    KEYW_TYPE      = 3,
-    FUNC_DEF_TYPE  = 4,
-    PARAM_TYPE     = 5,
-    VAR_DECL_TYPE  = 6,
-    CALL_TYPE      = 7
     };
 
 
@@ -139,11 +97,57 @@ const TREE_STATUS ErrorMas[] =
     };
 
 
+struct Keyword 
+    {
+    size_t num;
+    const char* name;
+    };
+
+
+const Keyword keyword_array[] = 
+    {
+    {11, "if"},
+    {12, "while"},
+    {13, "="},
+    {21, "sin"},
+    {22, "cos"},
+    {23, "floor"},
+    {24, "+"},
+    {25, "-"},
+    {26, "*"},
+    {27, "/"},
+    {28, "diff"},
+    {29, "sqrt"},
+    {31, "=="},
+    {32, "<"},
+    {33, ">"},
+    {34, "<="},
+    {35, ">="},
+    {36, "!="},
+    {37, "&&"},
+    {38, "||\0"},
+    {39, "!"},
+    {41, ";"},
+    {42, ","},
+    {51, "int"},
+    {61, "input"},
+    {62, "print"},
+    {71, "return"},
+    {72, "break"},
+    {73, "continue"},
+    {74, "abort"},
+    {5,  "else"},
+    {6,  "^"}
+    };
+
+
 void TreeCtor(Tree* tree);
 
 Type_error TreeDelete(Tree* tree, Node_t* node);
 
-Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file);
+Type_error TreePrefixPrint(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array);
+
+Type_error TreePrefixPrintNode(Tree* tree, Node_t* node, FILE* file, LangNameTableArray* table_array);
 
 bool TreeVerify(Tree* tree);
 
@@ -157,23 +161,19 @@ void PrintGraphEdge(size_t from, size_t to, Child child, const char* color);
 
 void PrintGraphNode(Node_t* node, size_t* number_of_node, Child child, const char* color); 
 
-Type_error GetString(Tree* tree, Text* data, char** string, size_t* i);
-
-Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i);
-
 Node_t* CreateNode(Token token, Types type, Node_t* left, Node_t* right);
-
-Type_error TreeRead(Tree* tree, Text* data);
 
 Type_error CheckTreeLinks(Tree* tree, Node_t* node);
 
-int SkipSpaces(Text* data, size_t i);
+Type_error TreeRead(Tree* tree, Text* data, LangNameTableArray* table_array);
 
-long long GetFileSize(FILE* file);
+Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
 
-void FileInput(FILE* file, Text* data);
+Node_t* MakeNodeFromText(Tree* tree, Text* data, size_t* i, LangNameTableArray* table_array);
 
-Node_t* CreateNodeFromBrackets(Tree* tree, Text* data, size_t* i);
+const char* GetKeyword(Node_t* node);
 
+const char* GetKeywordByNumber(int number_keyword);
 
-
+void ReverseBackDtor(LangNameTableArray* table_array, Tree* tree, 
+                 Text* analyz, Text* data_name_table);
