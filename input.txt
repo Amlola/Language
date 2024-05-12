@@ -1,22 +1,49 @@
+int x1 = 3;
+int x2 = 10;
+
 int main()
 type
     int a = input();
-    
-    print(Factorial(a));
+    int b = input();
+    int c = input();
+    int d = input();
+    int e = 16;
 
-    int b = a + 3;
+    while ((x2 > x1 || a == b) && c < 16)
+    type
+        if (a > b)
+        type
+            break;
+        sent
+
+        while (c <= d)
+        type
+            print(Func(c) * 2);
+            c = c + 1;
+
+            if (c == d)
+            type
+                break;
+            sent
+        sent
+
+        if (a == e)
+        type
+            continue;
+        sent
+
+        print(x2);
+
+        x1 = x1 + 1;
+
+        a = a + 1;
+    sent
 
     return 0;
 sent
-   
 
-int Factorial(int a, int b)
+int Func(int a)
 type
-    if (a == 1)
-    type
-        print(a);
-        return 1;
-    sent
-
-    return Factorial(a - 1) * a;
+    print(a + 100);
+    return a * 10;
 sent

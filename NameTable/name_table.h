@@ -81,7 +81,7 @@ LangNameTable* FindNameTable(LangNameTableArray* table_array, size_t number);
 
 NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArray* table_array);
 
-NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table);
+NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table, LangNameTableArray* table_array);
 
 void AddToNameTableIfNotFind(LangNameTable* name_table, char* name, size_t number, UnitNameTableTypes type); 
 

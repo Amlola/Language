@@ -10,14 +10,6 @@ static FILE* graph_file_list = NULL;
 
 #define PRINT_TO_GRAPH_FILE(...) fprintf(graph_file_list, __VA_ARGS__);
 
-
-#define INDEX_LIST
-
-#ifdef INDEX_LIST
-    typedef int iterator_t;
-#endif
-
-
 const int MAX_COMMAND_LENGTH = 125;
 
 #define POISON_VALUE_FOR_ADRESS (List_type*)0xDED
@@ -30,31 +22,6 @@ const int capacity_list   = 10;
 const int size_extend     =  2;
 const int ZERO            =  0;
 const int FREE_INDEX      = -1;
-
-
-typedef Ir List_type;
-
-
-struct Node
-    {
-    List_type value;
-    iterator_t prev;
-    iterator_t next;
-    };
-    
-
-struct LIST
-    {
-    Node* data;
-    size_t capacity;
-    size_t size;
-
-    iterator_t free;
-    iterator_t front;
-    iterator_t back;
-
-    int status;
-    };
 
 
 typedef enum

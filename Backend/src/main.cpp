@@ -1,4 +1,4 @@
-#include "../inc/ir.h"
+#include "../inc/TranslateToNasm.h"
 
 
 
@@ -50,15 +50,25 @@ int main(int argc, char* argv[])
 
 /*--------------------------------------------------------------*/
 
-    LIST instruction_list = {};
+    Ir ir = {};
 
-    ListCtor(&instruction_list);
+    IrCtor(&ir, &tree, &table_array);
+    
+    GetIr(&ir, tree.root, &table_array);
 
-    //GetIr(&instruction list, tree.root, &table_array);
+/*--------------------------------------------------------------*/
+
+    FILE* listing = fopen("listing.s", "w");
+
+    NasmTranslation(&ir, listing);
+
+    FillNasmData(listing, &table_array);
 
     ReverseBackDtor(&table_array, &tree, &tree_analyz, &data_name_table);
 
-    ListDtor(&instruction_list);
+    fclose(listing);
+
+    IrDtor(&ir);
 
     printf("ALL IS GOOD\n");
 

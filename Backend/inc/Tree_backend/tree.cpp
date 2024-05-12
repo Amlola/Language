@@ -141,8 +141,6 @@ Type_error TreeDtor(Tree* tree)
 
     tree->root = nullptr;
 
-    free(tree->root);
-
     tree->size = 0;
 
     return tree->status;
@@ -394,8 +392,8 @@ Node_t* PrefixReadTree(Tree* tree, Text* data, size_t* i, LangNameTableArray* ta
                 node = CREATE_NODE;
                 }
             }
-        } 
-
+        }
+        
         node->left  = MakeNodeFromText(tree, data, i, table_array);
 
         node->right = MakeNodeFromText(tree, data, i, table_array);
@@ -422,7 +420,7 @@ Node_t* MakeNodeFromText(Tree* tree, Text* data, size_t* i, LangNameTableArray* 
 
         (*i) += SPACE_MAGNIFICATION;
 
-        if (node == nullptr)
+        if (!node)
             return nullptr;
         }
 

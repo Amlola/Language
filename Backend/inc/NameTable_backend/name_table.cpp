@@ -201,7 +201,7 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
 
     fprintf(name_table_file, "\n");
 
-    fprintf(name_table_file, "%zu\n\n", table_array->ptr - 2);
+    fprintf(name_table_file, "%zu\n\n", table_array->ptr);
 
     fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].ptr, 
                                          table_array->Array[GLOBAL_TABLE_INDEX].table_number);
@@ -216,7 +216,7 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
 
     fprintf(name_table_file, "\n");
 
-    size_t i = 2;
+    size_t i = 0;
 
     while (i <= table_array->ptr)
         {

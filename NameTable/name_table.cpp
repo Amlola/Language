@@ -201,34 +201,48 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
 
     fprintf(name_table_file, "\n");
 
-    fprintf(name_table_file, "%zu\n\n", table_array->ptr - 2);
+    fprintf(name_table_file, "%zu\n\n", table_array->ptr);
 
     fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].ptr, 
                                          table_array->Array[GLOBAL_TABLE_INDEX].table_number);
+
+    size_t cur_func = 0;
 
     for (size_t j = 0; j < table_array->Array[GLOBAL_TABLE_INDEX].ptr; j++)
         {
         fprintf(name_table_file, "%zu %d\n", table_array->Array[GLOBAL_TABLE_INDEX].Table[j].id_index, 
                                              table_array->Array[GLOBAL_TABLE_INDEX].Table[j].type);
 
-        table_array->Array[j + 2].table_number = table_array->Array[GLOBAL_TABLE_INDEX].Table[j].id_index;
+        if (table_array->Array[GLOBAL_TABLE_INDEX].Table[j].type != VAR_NAME)
+            { 
+            table_array->Array[cur_func + 2].table_number = table_array->Array[GLOBAL_TABLE_INDEX].Table[j].id_index;
+            cur_func++;
+            }
         }
 
     fprintf(name_table_file, "\n");
 
     size_t i = 2;
 
+    size_t glob_vars = 0;
+
     while (i <= table_array->ptr)
         {
-        if (table_array->Array[GLOBAL_TABLE_INDEX].Table[i - 2].type != VAR_NAME)
+        for (size_t cur_var = 0; cur_var < table_array->Array[i].ptr; cur_var++)
             {
-            fprintf(name_table_file, "%zu %d\n", table_array->Array[i].ptr, table_array->Array[i].table_number);
+            printf("VAR: %s\n", table_array->Array[i].Table[cur_var].name);
+            if (FindInNameTable(&table_array->Array[GLOBAL_TABLE_INDEX], table_array->Array[i].Table[cur_var].name) != -1)
+                glob_vars++;
+            }
 
-            if ((error = WriteNameTableToFile(name_table_file, &(table_array->Array[i]))))
+        fprintf(name_table_file, "%zu %d\n", table_array->Array[i].ptr - glob_vars, table_array->Array[i].table_number);
+
+        if ((error = WriteNameTableToFile(name_table_file, &(table_array->Array[i]), table_array)))
                 return error;
 
-            fprintf(name_table_file, "\n");
-            }
+        glob_vars = 0;
+        
+        fprintf(name_table_file, "\n");
         
         i++;
         }
@@ -239,13 +253,16 @@ NameTableError WriteNameTableArrayToFile(FILE* name_table_file, LangNameTableArr
     }
 
 
-NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table)
+NameTableError WriteNameTableToFile(FILE* name_table_file, LangNameTable* table, LangNameTableArray* table_array)
     {
     assert(name_table_file);
     assert(table);
 
     for (size_t i = 0; i < table->ptr; i++)
-        fprintf(name_table_file, "%zu %d\n", table->Table[i].id_index, table->Table[i].type);
+        {
+        if (FindInNameTable(&table_array->Array[GLOBAL_TABLE_INDEX], table->Table[i].name) == -1)
+            fprintf(name_table_file, "%zu %d\n", table->Table[i].id_index, table->Table[i].type);
+        }
 
     return NO_NAME_TABLE_ERROR;
     }

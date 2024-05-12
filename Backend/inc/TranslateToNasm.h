@@ -1,57 +1,21 @@
-#include "tree_backend.h"
+#pragma once
 
 
-
-enum KeywordCode
-    {
-    #define DEF_KEYW(DEF, CODE, WORD) \
-        KEYW_ ## DEF = CODE,
-        
-        #include "../keyword"
-
-    #undef DEF_KEYW
-    };
+#include "ir.h"
 
 
-enum OperatorCode
-    {
-    #define DEF_OPER(DEF, CODE, SIGN, LEN) \
-        KEYW_ ## DEF = CODE,
+void FillNasmStart(FILE* file, Ir* ir);
 
-    #define DEF_OTHER(DEF, CODE, OTHER)    \
-        KEYW_ ## DEF = CODE,
+void FillNasmData(FILE* file, LangNameTableArray* table_array);
 
-        #include "../operators"
+IrError NasmTranslation(Ir* ir, FILE* file); 
 
-    #undef DEF_OPER
-    #undef DEF_OTHER
-    };
+void PrintPushToNasm(FILE* file, Ir_command* instr);
 
+void PrintPopToNasm(FILE* file, Ir_command* instr); 
 
-const int MAX_NAMES = 100;
+void PrintMathOperationToNasm(FILE* file, List_type command); 
 
-struct Asm
-    {
-    char** names_table;
-    int names_num;
-    int label_num;
-    };
+void PrintSqrtToNasm(FILE* file);
 
-
-
-void AsmInit(Asm* asmb);
-
-void GetAsmCode(Asm* asmb, FILE* file, Node_t* node);
-
-void CreateAsm(Asm* asmb, Node_t* node, FILE* file);
-
-static void PushParams(FILE* file, Node_t* node, Asm* asmb);
-
-static int GetVarPosition (const char* var, char** names_array, int n_names);
-
-static void PushVar (FILE* file, const char* var, Asm* asmb);
-
-
-
-
-
+void PrintConditionalToNasm(FILE* file, List_type com_instr, Ir* ir, size_t cur_func, size_t command);

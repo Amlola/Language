@@ -6,7 +6,6 @@
 #define ADD_TO_GLOBAL_TABLE(type)                                                                                    \
         AddToNameTableIfNotFind(&table_array->Array[GLOBAL_TABLE_INDEX], name_func.form.id,                          \
                                 FindInNameTable(&table_array->Array[GENERAL_TABLE_INDEX], name_func.form.id), type); \
-        CheckTableArraySize(table_array);                                                                            \
 
 #define PRINT_SYNTAX_ERROR(line, str_message, str_error)              \
         fprintf(stderr, "line: %zu\n", line);                         \
@@ -89,6 +88,8 @@ Node_t* GetDefFunc(LIST* tokens, LangNameTableArray* table_array)
         }
 
     ADD_TO_GLOBAL_TABLE(FUNC_NAME);
+
+    CheckTableArraySize(table_array);                                                                            
 
     NameTableCtor(&(table_array->Array[table_array->ptr]));
 

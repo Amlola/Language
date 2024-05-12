@@ -288,7 +288,7 @@ static void SetList(LIST* list, size_t size)
     }
 
 
-void ListGraphDumpFunction(LIST* list, const char* path, const char* signature, unsigned line)
+/*void ListGraphDumpFunction(LIST* list, const char* path, const char* signature, unsigned line)
     {
     assert(list);
 
@@ -372,4 +372,4 @@ void ListGraphDumpFunction(LIST* list, const char* path, const char* signature, 
     system(shell_command);
 
     dump_number++;
-    }
+    }*/
