@@ -55,9 +55,9 @@ enum Registers
     {
     IR_NO_REG = -1,
     IR_RAX    = 0,
-    IR_RBX    = 1,
-    IR_RCX    = 2,
-    IR_RDX    = 3,
+    IR_RCX    = 1,
+    IR_RDX    = 2,
+    IR_RBX    = 3,
     IR_RSP    = 4,
     IR_RBP    = 5,
     IR_RSI    = 6,
@@ -73,7 +73,7 @@ enum Registers
     };
 
 
-const char* const register_array[] = {"rax", "rbx", "rcx", "rdx", "rsp", "rbp", "rsi", "rdi", 
+const char* const register_array[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", 
                                       "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"};
 
 
@@ -98,7 +98,7 @@ struct Ir_command
     Registers reg1;
     Registers reg2;
     double num;
-    char comment[MAX_LEN_COMMENT];
+    char comment[MAX_LEN_COMMENT]; // const char* ?
     const char* call_func;
     size_t offset_var;
     const char* name_label;
@@ -169,4 +169,6 @@ struct Ir
 
     char glob_vars[MAX_GLOBALS][MAX_NAME_GLOB_VARS_LEN];
     size_t glob_vars_size;
+
+    size_t num_labels;
     };

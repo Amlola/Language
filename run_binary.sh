@@ -7,6 +7,4 @@ cd Backend
 make
 ./back.exe ../output.txt ../name_table.txt
 
-nasm -f elf64 listing.s
-ld -no-pie listing.o -o main
-./main
+chmod u+x main

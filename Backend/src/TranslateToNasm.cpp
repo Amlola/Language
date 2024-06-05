@@ -81,14 +81,14 @@ IrError NasmTranslation(Ir* ir, FILE* file)
                     {   
                     if (GET_COMMAND_VALUE.arg2_type == IR_NUM)
                         fprintf(file, "\t\tcmp %s, %zu\n", 
-                                            register_array[GET_COMMAND_VALUE.reg1],
-                                            (size_t)GET_COMMAND_VALUE.num);
+                                                register_array[GET_COMMAND_VALUE.reg1],
+                                                (size_t)GET_COMMAND_VALUE.num);
 
                     else 
                         {
                         fprintf(file, "\t\tcmp %s, %s\n",
-                                            register_array[GET_COMMAND_VALUE.reg1],
-                                            register_array[GET_COMMAND_VALUE.reg2]);  
+                                                register_array[GET_COMMAND_VALUE.reg1],
+                                                register_array[GET_COMMAND_VALUE.reg2]);  
                         }
 
                     break;
@@ -300,7 +300,3 @@ void FillNasmData(FILE* file, LangNameTableArray* table_array)
     fprintf(file, "section .data\n");
     fprintf(file, "var_buf: times %zu db 0\n", GetBufferSize(table_array));
     }
-
-
-#undef GET_CUR_FUNC
-#undef GET_FUNC_NAME

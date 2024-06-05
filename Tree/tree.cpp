@@ -5,9 +5,7 @@ void TreeCtor(Tree* tree)
     {   
     tree->status = TREE_OK;
 
-    tree->root = (Node_t*)calloc(1, sizeof(Node_t));
-
-    tree->root->left = tree->root->right = tree->root->parent = nullptr;
+    tree->root = nullptr;
 
     tree->size = 0;
     }

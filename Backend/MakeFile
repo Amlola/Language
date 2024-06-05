@@ -1,11 +1,11 @@
-SANIT_FLAGS = -fsanitize=address,alignment,undefined
+SANIT_FLAGS = #-fsanitize=address,alignment,undefined
 DEBUG = -D DUMP
 
 
 all: MYBACK
 
-MYBACK: main.o tree.o name_table.o read.o list.o ir.o trans_nasm.o
-	@g++ -g $(DEBUG) $(SANIT_FLAGS) -o back.exe obj/main.o inc/Tree_backend/tree.o inc/NameTable_backend/name_table.o inc/ReadingFile_backend/read.o inc/List_backend/list.o obj/TreeToIR.o obj/TranslateToNasm.o
+MYBACK: main.o tree.o name_table.o read.o list.o ir.o trans_nasm.o trans_bin.o elf_gen.o
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -o back.exe obj/main.o inc/Tree_backend/tree.o inc/NameTable_backend/name_table.o inc/ReadingFile_backend/read.o inc/List_backend/list.o obj/TreeToIR.o obj/TranslateToNasm.o obj/TranslateToBinary.o obj/elf.o	
 
 main.o: src/main.cpp
 	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c src/main.cpp -o obj/main.o
@@ -27,6 +27,12 @@ ir.o: src/TreeToIR.cpp
 
 trans_nasm.o: src/TranslateToNasm.cpp
 	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c src/TranslateToNasm.cpp -o obj/TranslateToNasm.o
+
+elf_gen.o: src/elf.cpp	
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c src/elf.cpp -o obj/elf.o
+
+trans_bin.o: src/TranslateToBinary.cpp
+	@g++ -g $(DEBUG) $(SANIT_FLAGS) -c src/TranslateToBinary.cpp -o obj/TranslateToBinary.o	
 
 clean:
 	rm obj/* back.exe inc/Tree_backend/*.o inc/NameTable_backend/*.o inc/ReadingFile_backend/*.o inc/List_backend/*.o

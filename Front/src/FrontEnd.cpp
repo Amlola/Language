@@ -134,6 +134,10 @@ Node_t* GetGlobalVariable(LIST* tokens, LangNameTableArray* table_array, List_ty
     if (var)
         return var;
 
+    free(rValue);
+
+    free(type);
+
     PushFront(tokens, var_name);
 
     return nullptr;
@@ -375,7 +379,10 @@ Node_t* GetFunc(LIST* tokens, List_type func, LangNameTableArray* table_array)
 	FIND_SYNTAX_ERROR(CheckCloseRoundBracket(tokens));
 
 	if (func.type == KEYW_TYPE)
+        {
+        free(name_func);
 		return CreateNode(func, KEYW_TYPE, nullptr, arg_branch);
+        }
 
 	else if (func.type == ID_TYPE)
 		return CreateNode(func, CALL_TYPE, arg_branch, name_func);
@@ -553,7 +560,7 @@ Node_t* GetAddSub(LIST* tokens, LangNameTableArray* table_array)
 
 	return first_expression; 
     }
-
+    
 
 Node_t* GetExpression(LIST* tokens, LangNameTableArray* table_array)
     {
@@ -593,8 +600,10 @@ Node_t* GetAssign(LIST* tokens, LangNameTableArray* table_array)
 	    }
 
 	else
+        {
         fprintf(stderr, "line: %zu\n", GET_TOKEN_VALUE.line);
 		fprintf(stderr, "error: unknown operator\n");
+        }
 
     return nullptr;
     }
@@ -648,6 +657,7 @@ Node_t* GetIf(LIST* tokens, LangNameTableArray* table_array)
 	PopFront(tokens);
 
     int init_array[NAME_TABLE_CAPACITY] = {};
+
     GetInitArray(init_array, table_array);
 
 	FIND_SYNTAX_ERROR(CheckOpenRoundBracket(tokens));

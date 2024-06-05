@@ -1,0 +1,57 @@
+int main()
+type
+    int a = input();
+    int b = input();
+    int c = input();
+
+    print(SolveQuadratic(a, b, c));
+
+    return 0;
+sent
+
+int SolveQuadratic(int a, int b, int c)
+type
+    if (a == 0)
+    type
+        return SolveLinear(b, c);
+    sent
+
+    int discr = b*b - 4*a*c;
+
+    if (discr < 0)
+    type
+        return 0;
+    sent
+
+    int minus_b = 0 - b;
+
+    if (discr == 0)
+    type
+        print(minus_b / (2 * a));
+        return 1;
+    sent
+
+    print((minus_b + sqrt(discr)) / (2 * a));
+    print((minus_b - sqrt(discr)) / (2 * a));
+
+    return 2;
+sent
+
+int SolveLinear(int b, int c)
+type
+    if (b == 0)
+    type
+        if (c == 0)
+        type
+            return 888;
+        sent
+
+        return 0;
+    sent
+
+    int minus_b = 0 - c;
+
+    print(minus_b / b);
+
+    return 1;
+sent

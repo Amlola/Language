@@ -1,5 +1,5 @@
 #include "../inc/TranslateToNasm.h"
-
+#include "../inc/BinaryTransl.h"
 
 
 int main(int argc, char* argv[]) 
@@ -64,13 +64,27 @@ int main(int argc, char* argv[])
 
     FillNasmData(listing, &table_array);
 
+/*--------------------------------------------------------------*/
+
+    /*FILE* file_elf = fopen("main", "wb");
+
+    BinaryTranslate elf = {};
+
+    ElfCtor(&elf, &ir);
+
+    GetBinaryFile(file_elf, &elf, &ir, &table_array);*/
+
+/*--------------------------------------------------------------*/
+
+    /*ElfDtor(&elf);*/
+
     ReverseBackDtor(&table_array, &tree, &tree_analyz, &data_name_table);
 
     fclose(listing);
 
     IrDtor(&ir);
 
-    printf("ALL IS GOOD\n");
+    printf("ALL IS GOOD\n\n\n");
 
     return 0;
     }

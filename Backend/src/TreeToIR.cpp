@@ -21,6 +21,8 @@ void IrCtor(Ir* ir, Tree* tree, LangNameTableArray* table_array)
     ir->while_label    = 0;
 
     ir->glob_vars_size = 0;
+
+    ir->num_labels     = 0;
     }
 
 
@@ -44,6 +46,8 @@ void IrDtor(Ir* ir)
     ir->while_label    = IR_POIZON_VALUE;
 
     ir->glob_vars_size = IR_POIZON_VALUE;
+
+    ir->num_labels     = IR_POIZON_VALUE;
     }
 
 
@@ -572,6 +576,8 @@ IrError GetIrComparison(Ir* ir, Node_t* node, LangNameTableArray* table_array, I
 
     ADD_LABEL(ir->logical_label++, "logic_end");
 
+    ir->num_labels += 2;
+
     (*cond)++;
 
     return NO_IR_ERROR;
@@ -599,6 +605,8 @@ IrError GetLogicalAnd(Ir* ir, Node_t* node, LangNameTableArray* table_array, siz
 
     ADD_LABEL(*cond, name);
 
+    ir->num_labels++;
+
     (*cond)++;
 
     return NO_IR_ERROR;
@@ -623,6 +631,8 @@ IrError GetLogicalOr(Ir* ir, Node_t* node, LangNameTableArray* table_array, size
     ADD_LABEL_JMP(IR_JE, *cond, name);
 
     ADD_LABEL(*cond, name);
+
+    ir->num_labels++;
 
     (*cond)++;
 
@@ -670,6 +680,8 @@ IrError GetIrIf(Ir* ir, Node_t* node, LangNameTableArray* table_array)
 
     ADD_LABEL(cur_if_count, "end_if");
 
+    ir->num_labels++;
+
     return NO_IR_ERROR;
     }
 
@@ -682,6 +694,8 @@ IrError GetIrWhile(Ir* ir, Node_t* node, LangNameTableArray* table_array)
    ir->while_label++;
 
     ADD_LABEL(ir->while_label, "start_while");
+
+    ir->num_labels++;
 
     ADD_MOV_REG_NUM(IR_R12, 0);
 
@@ -708,6 +722,7 @@ IrError GetIrWhile(Ir* ir, Node_t* node, LangNameTableArray* table_array)
 
     ADD_LABEL(cur_cycle, "end_while");
 
+    ir->num_labels++;
 
     return NO_IR_ERROR;
     }

@@ -1,4 +1,4 @@
-SANIT_FLAGS = #-fsanitize=address,undefined
+SANIT_FLAGS = -fsanitize=address,undefined
 DEBUG = -D DUMP
 
 all: MYFRONT
